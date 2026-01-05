@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PBJ SPN POLDA JATIM 2026</title>
+
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: url("background.jpg.jpeg") no-repeat center center fixed;
+      background-size: cover;
+      color: #1e293b;
+      overflow-x: hidden;
+    }
+
+    /* ===== NAVBAR ===== */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 60px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .brand span {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .login-btn {
+      padding: 12px 26px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      align-items: center;
+      gap: 60px;
+      padding: 140px 80px 80px; /* Padding atas ditambah karena navbar fixed */
+      min-height: 100vh;
+      /* Overlay gradasi putih agar teks terbaca jelas di atas background image */
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.85) 30%, rgba(255, 255, 255, 0.1) 100%);
+    }
+
+    .hero-text h2 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    .hero-text h2 span.blue {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-text h2 span.green {
+      background: linear-gradient(135deg, #059669, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-text p {
+      font-size: 18px;
+      color: #64748b;
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      animation: slideUp 0.8s ease-out 0.2s backwards;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      background: #0f172a;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 18px;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+      transition: all 0.3s ease;
+      animation: slideUp 0.8s ease-out 0.4s backwards;
+      border: none;
+      cursor: pointer;
+    }
+    .cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(15, 23, 42, 0.3);
+    }
+
+    .action-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      animation: slideUp 0.8s ease-out 0.4s backwards;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      border: none;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: white;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn-user { background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); }
+    .btn-admin { background: #0f172a; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3); }
+    .action-btn:hover {
+      transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ===== CARD VISUAL ===== */
+    .hero-card {
+      width: 100%;
+      max-width: 500px;
+      height: 320px;
+      border-radius: 26px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      position: relative;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    /* Elemen Dekoratif di belakang kartu */
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 50%;
+      top: -30px;
+      right: -30px;
+      z-index: -1;
+      opacity: 0.6;
+      filter: blur(40px);
+    }
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: linear-gradient(135deg, #10b981, #3b82f6);
+      border-radius: 50%;
+      bottom: -40px;
+      left: -40px;
+      z-index: -1;
+      opacity: 0.6;
+      filter: blur(40px);
+    }
+
+    .hero-card i {
+      font-size: 80px;
+      background: linear-gradient(135deg, #2563eb, #0d9488);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 10px 20px rgba(37, 99, 235, 0.3));
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    /* ===== NOTIFICATION ===== */
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .notification-box { position: relative; }
+    .notif-btn {
+      background: rgba(255, 255, 255, 0.5); border: none; width: 44px; height: 44px;
+      border-radius: 12px; cursor: pointer; position: relative;
+      color: #1e293b; font-size: 1.2rem; transition: 0.3s;
+    }
+    .notif-btn:hover { background: white; color: #2563eb; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .badge {
+      position: absolute; top: -5px; right: -5px; background: #ef4444; color: white;
+      font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 10px;
+      border: 2px solid white;
+    }
+    
+    .notif-panel {
+      position: absolute; top: 60px; right: 0; width: 320px;
+      background: white; border-radius: 20px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+      border: 1px solid #e2e8f0; opacity: 0; visibility: hidden; transform: translateY(10px);
+      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 200; overflow: hidden;
+    }
+    .notif-panel.active { opacity: 1; visibility: visible; transform: translateY(0); }
+    
+    .notif-header {
+      padding: 16px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;
+    }
+    .notif-header h3 { font-size: 1rem; font-weight: 700; }
+    .notif-header button { font-size: 0.8rem; color: #2563eb; background: none; border: none; cursor: pointer; font-weight: 600; }
+    
+    .notif-body { max-height: 300px; overflow-y: auto; }
+    .notif-item {
+      padding: 14px 16px; border-bottom: 1px solid #f8fafc; display: flex; gap: 12px;
+      transition: 0.2s; cursor: pointer; text-align: left;
+    }
+    .notif-item:hover { background: #f8fafc; }
+    .notif-item.unread { background: #eff6ff; }
+    .notif-item.unread:hover { background: #e0f2fe; }
+    
+    .notif-icon {
+      width: 36px; height: 36px; background: #dbeafe; color: #2563eb;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .notif-content h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; color: #1e293b; }
+    .notif-content p { font-size: 0.8rem; color: #64748b; line-height: 1.4; }
+    .notif-time { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; display: block; }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width: 900px) {
+      header { padding: 16px 24px; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 120px 24px 60px;
+        text-align: center;
+      }
+
+      .hero-text h2 { font-size: 2.5rem; }
+      .hero-text p { margin: 0 auto 36px; }
+      .hero-card { margin: 0 auto; height: 260px; }
+      .action-group { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header>
+    <div class="brand">
+      <img src="https://yt3.ggpht.com/a/AATXAJwDikBj_PcvGKe5caluqknHoXgqXk7I5vY1CqY9=s900-c-k-c0xffffffff-no-rj-mo">
+      <div>
+        <h1>PBJ SPN POLDA JATIM 2026</h1>
+        <span>Sistem Pengadaan Barang dan Jasa</span>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <div class="notification-box">
+        <button class="notif-btn" onclick="toggleNotif()">
+          <i class="fa-regular fa-bell"></i>
+          <span class="badge" id="notif-count">0</span>
+        </button>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-header">
+            <h3>Notifikasi</h3>
+            <button onclick="markRead()">Tandai dibaca</button>
+          </div>
+          <div class="notif-body" id="notifList">
+            <!-- Data will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-text">
+      <h2>
+        Platform Modern<br>
+        untuk <span class="blue">Pengadaan</span><br>
+        <span class="green">Barang & Jasa</span>
+      </h2>
+      <p>
+        Kelola proses pengadaan dengan efisien, transparan, dan terintegrasi.
+        Platform digital modern untuk mendukung operasional POLDA JATIM.
+      </p>
+      <button onclick="openModal()" class="cta"><i class="fa-solid fa-rocket"></i> Mulai Sekarang</button>
+    </div>
+
+    <div class="hero-card">
+      <i class="fa-solid fa-chart-line"></i>
+    </div>
+  </section>
+
+<!-- MODAL LOGIN -->
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <h3>Pilih Akses Masuk</h3>
+    <p>Silakan pilih role Anda untuk melanjutkan</p>
+    
+    <div class="modal-options">
+      <button onclick="goUser()" class="role-btn user">
+        <div class="icon-bg"><i class="fa-solid fa-users"></i></div>
+        <div class="text">
+          <strong>Masuk sebagai User</strong>
+          <span>Akses dashboard publik</span>
+        </div>
+        <i class="fa-solid fa-chevron-right arrow"></i>
+      </button>
+      <button onclick="goAdmin()" class="role-btn admin">
+        <div class="icon-bg"><i class="fa-solid fa-user-gear"></i></div>
+        <div class="text">
+          <strong>Masuk sebagai Admin</strong>
+          <span>Kelola data & pengaturan</span>
+        </div>
+        <i class="fa-solid fa-chevron-right arrow"></i>
+      </button>
+    </div>
+    <button onclick="closeModal()" class="cancel-btn">Batal</button>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('loginModal');
+  function openModal() { modal.classList.add('show'); }
+
+  function closeModal(){ modal.classList.remove('show'); }
+  function goAdmin(){
+    const password = prompt("Masukkan Password Admin:");
+    if (password === "URLOG2025") {
+      sessionStorage.setItem('isAdmin', 'true');
+      window.location.href = 'admin.html';
+    } else if (password !== null) {
+      alert("Password salah!");
+    }
+  }
+  function goUser(){ window.location.href='user.html'; }
+
+  // NOTIFICATION LOGIC
+  let pbjData = [];
+
+  async function loadNotifications() {
+    const pbjUrl = localStorage.getItem('PBJ_Url');
+    if (!pbjUrl || pbjUrl === 'null' || pbjUrl === 'undefined') {
+      pbjData = [{ type: 'info', title: 'Info', desc: 'Belum ada data PBJ yang terhubung.', time: 'Sekarang', read: true, link: '#' }];
+      renderNotif();
+      return;
+    }
+
+    const match = pbjUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+    if (!match) return;
+
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv`;
+
+    try {
+      const res = await fetch(csvUrl);
+      const text = await res.text();
+      const rows = parseCSV(text);
+      generateNotifications(rows);
+    } catch (e) {
+      console.error("Gagal load notifikasi:", e);
+    }
+  }
+
+  function parseCSV(str) {
+    const arr = [];
+    let quote = false;
+    let col = 0, row = 0;
+    for (let c = 0; c < str.length; c++) {
+        let cc = str[c], nc = str[c+1];
+        arr[row] = arr[row] || [];
+        arr[row][col] = arr[row][col] || '';
+        if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; }
+        else if (cc == '"') { quote = !quote; }
+        else if (cc == ',' && !quote) { ++col; }
+        else if ((cc == '\r' && nc == '\n' && !quote) || (cc == '\n' && !quote)) { ++row; col = 0; if (cc == '\r') ++c; }
+        else { arr[row][col] += cc; }
+    }
+    return arr;
+  }
+
+  function generateNotifications(rows) {
+    if (!rows || rows.length < 2) return;
+    
+    let headerRowIdx = -1, dateColIdx = -1;
+    for(let i = 0; i < Math.min(rows.length, 5); i++) {
+        const rowUpper = rows[i].map(h => (h||'').toString().toUpperCase());
+        const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO'));
+        if(idx !== -1) { headerRowIdx = i; dateColIdx = idx; break; }
+    }
+    if (headerRowIdx === -1) return;
+
+    const headers = rows[headerRowIdx].map(h => (h||'').toString().toUpperCase());
+    let nameIdx = headers.findIndex(h => h.includes('NAMA') || h.includes('PEKERJAAN') || h.includes('PAKET'));
+    if (nameIdx === -1) nameIdx = 1;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const maxDate = new Date(today); maxDate.setDate(today.getDate() + 7);
+
+    pbjData = [];
+    for (let i = headerRowIdx + 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row[dateColIdx]) continue;
+        const dateStr = row[dateColIdx].trim();
+        let contractDate = parseIndonesianDate(dateStr);
+        if (contractDate) {
+            contractDate.setHours(0,0,0,0);
+            if (contractDate >= today && contractDate <= maxDate) {
+                const diffTime = Math.abs(contractDate - today);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                const statusMsg = diffDays === 0 ? "Hari Ini" : `${diffDays} hari lagi`;
+                const name = row[nameIdx] || 'Tanpa Nama';
+                pbjData.push({
+                    type: 'warning', title: 'Peringatan Kontrak',
+                    desc: `Kontrak "${name}" berakhir dalam ${statusMsg}.`,
+                    time: statusMsg, read: false,
+                    link: `user.html?tab=PBJ&search=${encodeURIComponent(name)}`
+                });
+            }
+        }
+    }
+    if(pbjData.length === 0) pbjData.push({ type: 'info', title: 'Aman', desc: 'Tidak ada kontrak mendekati jatuh tempo.', time: 'Sekarang', read: true, link: '#' });
+    renderNotif();
+  }
+
+  function parseIndonesianDate(dateStr) {
+      if (!dateStr) return null;
+      dateStr = dateStr.trim();
+      let isoMatch = dateStr.match(/^(\d{4})\/\-\/\-$/);
+      if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
+      dateStr = dateStr.toLowerCase().replace(/,/g, '');
+      let parts = dateStr.match(/^(\d{1,2})\/\-\/\-$/);
+      if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
+      parts = dateStr.split(' ');
+      if (parts.length >= 3) {
+          const day = parseInt(parts[0]); const monthStr = parts[1]; const year = parseInt(parts[2]);
+          const months = { 'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11, 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'jun': 5, 'jul': 6, 'agu': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'des': 11 };
+          if (!isNaN(day) && !isNaN(year) && months[monthStr] !== undefined) return new Date(year, months[monthStr], day);
+      }
+      const d = new Date(dateStr); return isNaN(d.getTime()) ? null : d;
+  }
+
+  function renderNotif() {
+    const list = document.getElementById('notifList');
+    const badge = document.getElementById('notif-count');
+    let html = '';
+    let unread = 0;
+
+    pbjData.forEach(item => {
+      if(!item.read) unread++;
+      let icon = 'fa-bell';
+      if(item.type === 'success') icon = 'fa-check-circle';
+      if(item.type === 'warning') icon = 'fa-exclamation-triangle';
+      if(item.type === 'info') icon = 'fa-info-circle';
+      
+      html += `
+        <div class="notif-item ${item.read ? '' : 'unread'}" onclick="window.location.href='${item.link}'">
+          <div class="notif-icon"><i class="fa-solid ${icon}"></i></div>
+          <div class="notif-content">
+            <h4>${item.title}</h4>
+            <p>${item.desc}</p>
+            <span class="notif-time">${item.time}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    list.innerHTML = html;
+    badge.innerText = unread;
+    badge.style.display = unread > 0 ? 'block' : 'none';
+  }
+
+  function toggleNotif() { document.getElementById('notifPanel').classList.toggle('active'); }
+  function markRead() { pbjData.forEach(d => d.read = true); renderNotif(); }
+  
+  // Init
+  loadNotifications();
+  
+  // Close when clicking outside
+  window.addEventListener('click', (e) => {
+    if (!e.target.closest('.notification-box')) {
+      document.getElementById('notifPanel').classList.remove('active');
+    }
+  });
+</script>
+
+<style>
+/* MODAL */
+.modal {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000;
+}
+.modal.show { opacity: 1; pointer-events: auto; }
+
+.modal-box {
+  background: white; padding: 32px; border-radius: 24px; width: 90%; max-width: 420px;
+  text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(20px); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal.show .modal-box { transform: translateY(0); }
+
+.modal-box h3 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+.modal-box p { color: #64748b; font-size: 0.95rem; margin-bottom: 24px; }
+
+.modal-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+.role-btn {
+  display: flex; align-items: center; gap: 16px; width: 100%; padding: 16px;
+  border: 1px solid #e2e8f0; border-radius: 16px; background: white;
+  cursor: pointer; transition: all 0.2s ease; text-align: left;
+  position: relative; overflow: hidden;
+}
+.role-btn:hover { border-color: #3b82f6; background: #eff6ff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1); }
+
+.role-btn .icon-bg {
+  width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; flex-shrink: 0; transition: 0.2s;
+}
+.role-btn.user .icon-bg { background: #dbeafe; color: #2563eb; }
+.role-btn.admin .icon-bg { background: #f1f5f9; color: #475569; }
+
+.role-btn:hover .icon-bg { transform: scale(1.1); }
+
+.role-btn .text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.role-btn strong { color: #1e293b; font-size: 1rem; font-weight: 700; }
+.role-btn span { color: #64748b; font-size: 0.85rem; font-weight: 500; }
+
+.role-btn .arrow { color: #cbd5e1; transition: 0.2s; }
+.role-btn:hover .arrow { color: #3b82f6; transform: translateX(4px); }
+
+/* Admin Login Styles */
+.input-wrapper {
+  position: relative; margin-bottom: 20px;
+}
+.input-wrapper i {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: #94a3b8; font-size: 1rem;
+}
+.input-wrapper input {
+  width: 100%; padding: 14px 14px 14px 45px;
+  border: 1px solid #cbd5e1; border-radius: 14px;
+  font-size: 1rem; outline: none; transition: 0.3s;
+  color: #1e293b; background: #f8fafc;
+}
+.input-wrapper input:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+.input-wrapper input.error { border-color: #ef4444; animation: shake 0.3s; }
+
+.login-submit-btn {
+  width: 100%; padding: 14px; background: #0f172a; color: white;
+  border: none; border-radius: 14px; font-weight: 600; font-size: 1rem;
+  cursor: pointer; transition: 0.3s; margin-bottom: 10px;
+}
+.login-submit-btn:hover { background: #1e293b; transform: translateY(-2px); }
+
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+.cancel-btn {
+  background: none; border: none; color: #94a3b8; font-weight: 600; cursor: pointer;
+  font-size: 0.95rem; padding: 10px 20px; border-radius: 50px; transition: 0.2s;
+}
+.cancel-btn:hover { color: #ef4444; background: #fef2f2; }
+</style>
+</body>
+</html>

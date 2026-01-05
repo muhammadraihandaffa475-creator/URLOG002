@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Dashboard System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Menggunakan style yang sama dengan index.html */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f9ff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e293b;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+}
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 24px;
+    padding: 25px;
+    width: 98vw;
+    height: 96vh;
+    max-width: none;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-top: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1), inset 0 0 30px rgba(255, 255, 255, 0.5);
+    position: relative;
+    z-index: 10;
+    animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    flex-shrink: 0;
+}
+.icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00eaff, #0096ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 234, 255, 0.4);
+}
+.header-text { flex: 1; }
+.title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 2px;
+    color: #0f172a;
+}
+.subtitle { color: #64748b; font-weight: 400; font-size: 0.9rem; margin-bottom: 0; }
+.cloud-status { font-size: 0.85rem; padding: 8px 16px; border-radius: 20px; background: #f1f5f9; display: inline-block; color: #64748b; border: 1px solid #e2e8f0; white-space: nowrap; }
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 25px;
+    text-align: left;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Input Style */
+.form-section {
+    overflow-y: auto;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.input-group { margin-bottom: 20px; text-align: left; }
+.input-label { display: block; margin-bottom: 10px; font-weight: 600; color: #334155; font-size: 0.9rem; }
+input[type="text"] {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+input[type="text"]:focus {
+    border-color: #0ea5e9;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+select {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+textarea {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+    resize: vertical;
+    font-family: 'Inter', sans-serif;
+}
+textarea:focus {
+    border-color: #0ea5e9;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+select option { background: #ffffff; color: #1e293b; }
+
+/* Buttons */
+.button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+.btn {
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.btn-save {
+    background: linear-gradient(135deg, #00eaff, #0096ff);
+    color: #000;
+    box-shadow: 0 8px 20px rgba(0, 234, 255, 0.3);
+}
+.btn-save:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0, 234, 255, 0.4); }
+.btn-back {
+    background: #e2e8f0;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.btn-back:hover { background: #cbd5e1; color: #1e293b; }
+.btn-upload {
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: white;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
+.btn-upload:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(139, 92, 246, 0.4); }
+.btn-delete {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+.btn-delete:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(239, 68, 68, 0.4); }
+
+/* Table Style */
+.table-container {
+    border-radius: 12px;
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    height: 100%;
+    overflow-y: auto;
+}
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
+th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
+th { background: #f8fafc; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; position: sticky; top: 0; z-index: 5; }
+td { color: #334155; transition: background 0.2s; }
+tr:hover td { background: #f0f9ff; }
+tr:last-child td { border-bottom: none; }
+.status-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px;
+}
+.status-active { background-color: #27c93f; box-shadow: 0 0 8px rgba(39, 201, 63, 0.4); }
+.status-empty { background-color: #ff5f56; box-shadow: 0 0 8px rgba(255, 95, 86, 0.4); }
+
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* --- BACKGROUND ANIMATION --- */
+.bg-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.6;
+    animation: float 10s infinite ease-in-out alternate;
+}
+
+.blob-1 {
+    top: -10%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: #a855f7;
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    bottom: -10%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: #3b82f6;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 50px) scale(1.1); }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Grid Pattern */
+.bg-grid {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 1;
+    pointer-events: none;
+    mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+}
+
+@media (max-width: 768px) {
+    .button-group { grid-template-columns: 1fr; }
+    .glass-card { padding: 20px; height: auto; min-height: 100vh; width: 100%; border-radius: 0; }
+    .content-grid { grid-template-columns: 1fr; gap: 30px; overflow: visible; }
+    .table-container { height: 500px; }
+}
+</style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    <div class="bg-grid"></div>
+
+    <div class="glass-card">
+        <div class="admin-header">
+            <div class="icon-circle">
+                <i class="fas fa-user-astronaut"></i>
+            </div>
+            <div class="header-text">
+                <h1 class="title">Admin Dashboard</h1>
+                <p class="subtitle">Kelola Link Spreadsheet System</p>
+            </div>
+            <div id="cloudStatus" class="cloud-status">
+                <i class="fas fa-cloud"></i> Status Cloud: <span id="statusText">Memeriksa...</span>
+            </div>
+            <div class="notif-bell" id="adminNotifBell" onclick="toggleAdminNotif()" style="display:none;">
+                <i class="fas fa-bell"></i>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- Kolom Kiri: Form -->
+            <div class="form-section">
+                <div class="input-group">
+                    <label class="input-label">Pilih Bagian:</label>
+                    <select id="sectionSelect" onchange="loadSavedUrl()">
+                        <option value="RPD">RPD</option>
+                        <option value="LRA">LRA</option>
+                        <option value="PBJ">PBJ</option>
+                        <option value="E-PERWABKU">E-PERWABKU</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Masukkan Link URL:</label>
+                    <input type="text" id="urlInput" placeholder="Tempel link Google Sheets di sini...">
+                </div>
+
+                <div class="input-group" id="sidebarInputGroup" style="display:none;">
+                    <label class="input-label">Data Sidebar PBJ (Format: Tanggal | Judul):</label>
+                    <textarea id="sidebarInput" rows="6" placeholder="24 Jan 2026 | Pengadaan Laptop&#10;22 Jan 2026 | Renovasi Gedung"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-save" onclick="simpanUrl()">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
+                    <button class="btn btn-delete" onclick="hapusUrl()">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                    <button class="btn btn-upload" id="btnForceUpload" onclick="forceUploadToCloud()">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload ke Cloud
+                    </button>
+                    <button class="btn" style="background: #64748b; color: white;" onclick="testNotification()">
+                        <i class="fas fa-vial"></i> Test Notif
+                    </button>
+                    <button class="btn btn-back" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Tabel -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Bagian</th><th>Status</th><th>Link Preview</th></tr>
+                    </thead>
+                    <tbody id="linksTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // KONFIGURASI CLOUD (Agar data bisa dilihat semua user)
+        // 1. Buka https://jsonbin.io, daftar/login.
+        // 2. Buat Bin baru (JSON kosong {}), copy Bin ID.
+        // 3. Copy API Key (X-Master-Key) dari menu API Keys.
+        const CLOUD_CONFIG = {
+            BIN_ID: '694b67bd43b1c97be901e66c', // Bin ID Anda
+            API_KEY: '$2a$10$h08CHo/2k.EXdddjlF1Jj.wgLWCrn5ygHtQqUzOj7fZxG5RFYTYl6' // Admin WAJIB pakai Master Key
+        };
+
+        // Saat halaman dimuat, ambil URL yang sudah tersimpan (jika ada)
+        window.onload = async function() {
+            // Cek apakah user sudah login dari index.html
+            if (!sessionStorage.getItem('isAdmin')) {
+                alert("Akses Ditolak! Silakan login dari halaman utama.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            updateCloudStatusUI();
+            await syncFromCloud(); // Ambil data terbaru dari cloud saat admin login
+            loadSavedUrl();
+            updateTable();
+            checkPBJNotifications(); // Cek notifikasi kontrak saat admin login
+
+            // --- FITUR OTOMATIS: Interval & Permission ---
+            if ("Notification" in window) {
+                if (Notification.permission === "default") {
+                    document.addEventListener('click', () => Notification.requestPermission(), { once: true });
+                }
+                setInterval(checkPBJNotifications, 30 * 60 * 1000); // Cek otomatis setiap 30 menit
+            }
+        }
+
+        function updateCloudStatusUI() {
+            const statusText = document.getElementById('statusText');
+            const statusDiv = document.getElementById('cloudStatus');
+            
+            if (CLOUD_CONFIG.BIN_ID && CLOUD_CONFIG.API_KEY) {
+                statusText.innerHTML = '<span style="color: #10b981; font-weight: 600;">Terhubung (Aktif)</span>';
+                statusDiv.style.background = '#ecfdf5';
+                statusDiv.style.border = '1px solid #a7f3d0';
+            } else {
+                statusText.innerHTML = '<span style="color: #ef4444; font-weight: 600;">Belum Dikonfigurasi</span>';
+                statusDiv.style.background = '#fef2f2';
+                statusDiv.style.border = '1px solid #fecaca';
+                statusDiv.title = "Isi BIN_ID dan API_KEY di dalam kode program agar link bisa dilihat user lain.";
+            }
+        }
+
+        function loadSavedUrl() {
+            const section = document.getElementById('sectionSelect').value;
+            let savedUrl = localStorage.getItem(section + '_Url');
+            if (savedUrl === 'null' || savedUrl === 'undefined') savedUrl = ''; // Bersihkan nilai null string
+            document.getElementById('urlInput').value = savedUrl || '';
+
+            // Logika khusus untuk input Sidebar PBJ
+            const sidebarGroup = document.getElementById('sidebarInputGroup');
+            if (section === 'PBJ') {
+                sidebarGroup.style.display = 'block';
+                let sidebarData = localStorage.getItem('PBJ_Sidebar_Data');
+                if (sidebarData === 'null' || sidebarData === 'undefined') sidebarData = '';
+                document.getElementById('sidebarInput').value = sidebarData || '';
+            } else {
+                sidebarGroup.style.display = 'none';
+            }
+        }
+
+        async function simpanUrl() {
+            const section = document.getElementById('sectionSelect').value;
+            const url = document.getElementById('urlInput').value;
+            
+            if (!url) {
+                alert("Mohon masukkan URL terlebih dahulu!");
+                return;
+            }
+
+            // Simpan ke LocalStorage browser
+            localStorage.setItem(section + '_Url', url);
+            
+            // Simpan data sidebar jika sedang di menu PBJ
+            if (section === 'PBJ') {
+                const sidebarData = document.getElementById('sidebarInput').value;
+                localStorage.setItem('PBJ_Sidebar_Data', sidebarData);
+            }
+
+            // SIMPAN KE CLOUD (Agar user lain bisa melihat)
+            await saveToCloud(true); // true = silent mode (no alert if success, handled by simpanUrl alert)
+
+            alert("URL untuk " + section + " berhasil disimpan!");
+            updateTable();
+        }
+
+        async function hapusUrl() {
+            const section = document.getElementById('sectionSelect').value;
+            
+            if (!confirm(`Apakah Anda yakin ingin MENGHAPUS link untuk bagian ${section}?\nData akan hilang dari tampilan User.`)) {
+                return;
+            }
+
+            // Hapus dari LocalStorage
+            localStorage.removeItem(section + '_Url');
+            
+            // Hapus data sidebar jika PBJ
+            if (section === 'PBJ') {
+                localStorage.removeItem('PBJ_Sidebar_Data');
+            }
+
+            // Kosongkan input form
+            loadSavedUrl(); // Reload form agar kosong
+
+            // Simpan perubahan kosong ke Cloud
+            await saveToCloud(true);
+
+            alert(`Data ${section} berhasil dihapus!`);
+            updateTable();
+        }
+
+        async function forceUploadToCloud() {
+            // AUTO-SAVE: Pastikan apa yang tertulis di input tersimpan ke LocalStorage sebelum upload
+            // Ini mencegah kasus user mengetik link tapi lupa klik "Simpan Perubahan" sebelum upload
+            const section = document.getElementById('sectionSelect').value;
+            const url = document.getElementById('urlInput').value;
+            if (url) {
+                localStorage.setItem(section + '_Url', url);
+                if (section === 'PBJ') {
+                    const sidebarData = document.getElementById('sidebarInput').value;
+                    localStorage.setItem('PBJ_Sidebar_Data', sidebarData);
+                }
+            }
+
+            const btn = document.getElementById('btnForceUpload');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengupload...';
+            btn.disabled = true;
+
+            const success = await saveToCloud(false); // false = show alert/status on button
+            
+            if (success) {
+                btn.innerHTML = '<i class="fas fa-check"></i> Berhasil!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    alert("Data berhasil diupload ke Cloud! Sekarang user lain bisa melihatnya.");
+                }, 1000);
+            } else {
+                btn.innerHTML = '<i class="fas fa-times"></i> Gagal';
+                setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
+            }
+        }
+
+        // Fungsi untuk mengambil data dari Cloud (JsonBin)
+        async function syncFromCloud() {
+            if (!CLOUD_CONFIG.BIN_ID || !CLOUD_CONFIG.API_KEY) return;
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CLOUD_CONFIG.BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': CLOUD_CONFIG.API_KEY }
+                });
+                if (res.ok) {
+                    const json = await res.json();
+                    const data = json.record;
+                    if (data && typeof data === 'object') {
+                        // Simpan ke localStorage agar sinkron
+                        Object.keys(data).forEach(key => {
+                            // Pastikan tidak menyimpan null/undefined sebagai string
+                            const val = data[key];
+                            if (val !== null && val !== undefined) {
+                                localStorage.setItem(key, val);
+                            }
+                        });
+                    }
+                }
+            } catch (e) { console.error("Gagal sync cloud:", e); }
+        }
+
+        // Fungsi untuk menyimpan data ke Cloud (JsonBin)
+        async function saveToCloud(silent = false) {
+            if (!CLOUD_CONFIG.BIN_ID || !CLOUD_CONFIG.API_KEY) {
+                // Alert sudah muncul di onload, tidak perlu spam alert di sini, cukup log
+                console.warn("Fitur Cloud belum dikonfigurasi. Data hanya tersimpan lokal.");
+                return;
+            }
+            
+            const data = {
+                'RPD_Url': localStorage.getItem('RPD_Url') || '',
+                'LRA_Url': localStorage.getItem('LRA_Url') || '',
+                'PBJ_Url': localStorage.getItem('PBJ_Url') || '',
+                'E-PERWABKU_Url': localStorage.getItem('E-PERWABKU_Url') || '',
+                'PBJ_Sidebar_Data': localStorage.getItem('PBJ_Sidebar_Data') || ''
+            };
+            
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${CLOUD_CONFIG.BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': CLOUD_CONFIG.API_KEY },
+                    body: JSON.stringify(data)
+                });
+                if (!res.ok) {
+                    let errMsg = `Status ${res.status}`;
+                    try {
+                        const json = await res.json();
+                        if (json.message) errMsg += ` - ${json.message}`;
+                    } catch(e) {}
+                    throw new Error(errMsg);
+                }
+                return true;
+            } catch (e) { 
+                console.error("Gagal save cloud:", e); 
+                if(!silent) alert(`Gagal upload ke Cloud.\nError: ${e.message}\n\nKemungkinan Bin ID salah atau API Key tidak valid.`); 
+                return false;
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('isAdmin'); // Hapus sesi login
+            window.location.href = 'index.html';
+        }
+
+        function updateTable() {
+            const sections = ['RPD', 'LRA', 'PBJ', 'E-PERWABKU'];
+            const tbody = document.getElementById('linksTableBody');
+            tbody.innerHTML = '';
+
+            sections.forEach(sec => {
+                let url = localStorage.getItem(sec + '_Url');
+                if (url === 'null' || url === 'undefined') url = '';
+                
+                const hasUrl = url && url.trim() !== '';
+                const statusDot = hasUrl ? '<span class="status-dot status-active"></span>' : '<span class="status-dot status-empty"></span>';
+                const statusText = hasUrl ? 'Aktif' : 'Kosong';
+                const shortUrl = hasUrl ? (url.length > 25 ? url.substring(0, 25) + '...' : url) : '-';
+                
+                const row = `<tr>
+                    <td>${sec}</td>
+                    <td>${statusDot} ${statusText}</td>
+                    <td style="font-family: monospace;">${shortUrl}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // --- FITUR NOTIFIKASI KONTRAK (Sama seperti User) ---
+        async function checkPBJNotifications() {
+            const pbjUrl = localStorage.getItem('PBJ_Url');
+            if (!pbjUrl) return;
+            
+            const match = pbjUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (!match) return;
+            
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv`;
+            try {
+                const res = await fetch(csvUrl);
+                const text = await res.text();
+                const rows = parseCSV(text);
+                checkContractDeadlines(rows);
+            } catch (e) { console.error("Gagal cek notifikasi PBJ", e); }
+        }
+
+        function parseCSV(str) {
+            const arr = []; let quote = false; let col = 0, row = 0;
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; }
+                else if (cc == '"') { quote = !quote; }
+                else if (cc == ',' && !quote) { ++col; }
+                else if ((cc == '\r' && nc == '\n' && !quote) || (cc == '\n' && !quote)) { ++row; col = 0; if (cc == '\r') ++c; }
+                else { arr[row][col] += cc; }
+            }
+            return arr;
+        }
+
+        function checkContractDeadlines(rows) {
+            const expiringContracts = getExpiringContracts(rows);
+            
+            if (expiringContracts.length > 0) {
+                showContractNotification(expiringContracts);
+                updateAdminBell(expiringContracts);
+                sendBrowserNotification(expiringContracts);
+            }
+        }
+
+        function getExpiringContracts(rows) {
+            if (!rows || rows.length < 2) return [];
+            
+            // Cari baris header yang mengandung kata kunci tanggal kontrak (Scan 5 baris pertama)
+            let headerRowIdx = -1;
+            let dateColIdx = -1;
+            
+            for(let i = 0; i < Math.min(rows.length, 5); i++) {
+                const rowUpper = rows[i].map(h => (h||'').toString().toUpperCase());
+                const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU'));
+                if(idx !== -1) {
+                    headerRowIdx = i;
+                    dateColIdx = idx;
+                    break;
+                }
+            }
+
+            if (headerRowIdx === -1 || dateColIdx === -1) return [];
+            
+            const headers = rows[headerRowIdx].map(h => (h||'').toString().toUpperCase());
+
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const maxDate = new Date(today); maxDate.setDate(today.getDate() + 7);
+
+            const expiringContracts = [];
+
+            for (let i = headerRowIdx + 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row[dateColIdx]) continue;
+                const dateStr = row[dateColIdx].trim();
+                let contractDate = parseIndonesianDate(dateStr);
+                if (contractDate) {
+                    contractDate.setHours(0, 0, 0, 0);
+                    if (contractDate >= today && contractDate <= maxDate) {
+                        let nameIdx = headers.findIndex(h => h.includes('NAMA') || h.includes('PEKERJAAN') || h.includes('KEGIATAN') || h.includes('PAKET') || h.includes('URAIAN'));
+                        if (nameIdx === -1) nameIdx = 1;
+                        const contractName = row[nameIdx] || 'Kontrak Tanpa Nama';
+                        
+                        const diffTime = Math.abs(contractDate - today);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        const statusMsg = diffDays === 0 ? "HARI INI" : `${diffDays} hari lagi`;
+
+                        expiringContracts.push({ name: contractName, date: dateStr, status: statusMsg });
+                    }
+                }
+            }
+            return expiringContracts;
+        }
+
+        function parseIndonesianDate(dateStr) {
+            if (!dateStr) return null;
+            dateStr = dateStr.trim();
+            
+            // Coba format YYYY-MM-DD (ISO)
+            let isoMatch = dateStr.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+            if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
+
+            dateStr = dateStr.toLowerCase().replace(/,/g, '');
+            
+            // Format: DD/MM/YYYY
+            let parts = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
+
+            // Format: DD Bulan YYYY
+            parts = dateStr.split(' ');
+            if (parts.length >= 3) {
+                const day = parseInt(parts[0]);
+                const monthStr = parts[1];
+                const year = parseInt(parts[2]);
+                const months = { 'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11, 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'jun': 5, 'jul': 6, 'agu': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'des': 11 };
+                if (!isNaN(day) && !isNaN(year) && months[monthStr] !== undefined) return new Date(year, months[monthStr], day);
+            }
+            
+            // Fallback ke default JS Date parser
+            const d = new Date(dateStr);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        let adminActiveContracts = [];
+        function updateAdminBell(contracts) {
+            adminActiveContracts = contracts;
+            const bell = document.getElementById('adminNotifBell');
+            bell.style.display = 'block';
+            bell.classList.add('active');
+            bell.innerHTML = `<i class="fas fa-bell"></i><span class="badge">${contracts.length}</span>`;
+        }
+
+        function toggleAdminNotif() {
+            const container = document.getElementById('contractNotifContainer');
+            if(container) container.remove();
+            if(adminActiveContracts.length > 0) showContractNotification(adminActiveContracts);
+        }
+
+        function showContractNotification(contracts) {
+            // Inject Styles untuk Notifikasi Mobile-like
+            if (!document.getElementById('notifStyles')) {
+                const style = document.createElement('style');
+                style.id = 'notifStyles';
+                style.innerHTML = `
+                    @keyframes notifSlideDown { from { transform: translateY(-150%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                    @keyframes notifSlideUp { to { transform: translateY(-150%); opacity: 0; } }
+                    .notif-mobile-card {
+                        background: rgba(255, 255, 255, 0.95);
+                        backdrop-filter: blur(12px);
+                        -webkit-backdrop-filter: blur(12px);
+                        border-radius: 24px;
+                        padding: 18px;
+                        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.05);
+                        display: flex;
+                        gap: 16px;
+                        align-items: flex-start;
+                        animation: notifSlideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+                        width: 100%;
+                        pointer-events: auto;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .notif-icon {
+                        width: 48px; height: 48px;
+                        background: linear-gradient(135deg, #ef4444, #dc2626);
+                        border-radius: 16px;
+                        display: flex; align-items: center; justify-content: center;
+                        color: white; font-size: 1.4rem;
+                        box-shadow: 0 8px 16px rgba(239, 68, 68, 0.25);
+                        flex-shrink: 0;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            let notifContainer = document.getElementById('contractNotifContainer');
+            if (!notifContainer) { notifContainer = document.createElement('div'); notifContainer.id = 'contractNotifContainer'; notifContainer.style.cssText = "position: fixed; top: 100px; right: 30px; width: 350px; z-index: 2000; display: flex; flex-direction: column; gap: 10px;"; document.body.appendChild(notifContainer); }
+            const alertBox = document.createElement('div'); alertBox.style.cssText = "background: #fff; border-left: 5px solid #ef4444; padding: 15px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); animation: slideInRight 0.5s; position: relative; border: 1px solid #e2e8f0;";
+            
+            // Update container style for mobile look
+            notifContainer.style.cssText = "position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 420px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none;";
+            alertBox.className = 'notif-mobile-card';
+            alertBox.style.cssText = ''; // Reset inline styles to use class
+
+            let listHtml = '<ul style="margin: 8px 0 0; padding: 0; list-style: none; max-height: 120px; overflow-y: auto;">';
+            contracts.forEach(c => {
+                listHtml += `
+                <li style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #475569;">
+                    <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">${c.name}</span>
+                    <span style="font-size: 0.7rem; font-weight: 700; color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 20px;">${c.status}</span>
+                </li>`;
+            });
+            listHtml += '</ul>';
+
+            alertBox.innerHTML = `
+                <div class="notif-icon">
+                    <i class="fas fa-bell fa-shake"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #0f172a;">Peringatan Kontrak</h4>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Baru saja</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.9rem; color: #64748b; line-height: 1.4;">
+                        Terdapat <strong style="color: #ef4444;">${contracts.length} kontrak</strong> mendekati jatuh tempo.
+                    </p>
+                    ${listHtml}
+                </div>
+                <button onclick="dismissNotif(this)" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px;"><i class="fas fa-times"></i></button>
+            `;
+            
+            notifContainer.appendChild(alertBox);
+            playNotificationSound(); // Mainkan suara
+            setTimeout(() => { if(alertBox.parentElement) dismissNotif(alertBox.querySelector('button')); }, 8000);
+        }
+
+        window.dismissNotif = function(btn) {
+            const card = btn.closest('.notif-mobile-card');
+            card.style.animation = 'notifSlideUp 0.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1)';
+            setTimeout(() => card.remove(), 500);
+        }
+
+        function playNotificationSound() {
+            // Suara 'Ting' sederhana
+            const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+            audio.play().catch(e => console.log("Audio play failed (user interaction needed first)", e));
+        }
+
+        // --- FUNGSI TEST / SIMULASI ---
+        async function testNotification() {
+            if (Notification.permission === "denied") {
+                alert("Izin notifikasi diblokir! Mohon izinkan notifikasi di pengaturan browser agar fitur ini berjalan.");
+                return;
+            }
+
+            if (Notification.permission === "default") {
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") return;
+            }
+
+            // Coba ambil data asli
+            const pbjUrl = localStorage.getItem('PBJ_Url');
+            if (pbjUrl) {
+                const match = pbjUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                if (match) {
+                    try {
+                        const csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv`;
+                        const res = await fetch(csvUrl);
+                        const text = await res.text();
+                        const rows = parseCSV(text);
+                        const contracts = getExpiringContracts(rows);
+
+                        if (contracts.length > 0) {
+                            showContractNotification(contracts);
+                            updateAdminBell(contracts);
+                            sendBrowserNotification(contracts);
+                            return;
+                        } else {
+                            alert("Tidak ada kontrak mendekati jatuh tempo pada data asli.");
+                            return;
+                        }
+                    } catch(e) { console.error(e); }
+                }
+            }
+
+            // Fallback Simulasi
+            const dummyContracts = [{ name: "Contoh: Pengadaan Laptop (Simulasi)", status: "HARI INI" }, { name: "Contoh: Renovasi Gedung (Simulasi)", status: "3 hari lagi" }];
+            showContractNotification(dummyContracts);
+            updateAdminBell(dummyContracts);
+            sendBrowserNotification(dummyContracts);
+        }
+
+        function sendBrowserNotification(contracts) {
+            if (!("Notification" in window)) return;
+
+            const title = "Admin: Peringatan Kontrak";
+            const options = {
+                body: `Perhatian! Ada ${contracts.length} kontrak yang perlu ditinjau.`,
+                icon: "https://yt3.ggpht.com/a/AATXAJwDikBj_PcvGKe5caluqknHoXgqXk7I5vY1CqY9=s900-c-k-c0xffffffff-no-rj-mo",
+                requireInteraction: true
+            };
+
+            if (Notification.permission === "granted") {
+                new Notification(title, options);
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") new Notification(title, options);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

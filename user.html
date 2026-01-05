@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User View - Dashboard System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* Style Global */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f9ff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #1e293b;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- CUSTOM SCROLLBAR (Agar Tampilan Lebih Modern) --- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    border: 2px solid transparent; /* Memberi jarak agar tidak nempel */
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+}
+
+/* Header Navigasi */
+.navbar {
+    position: relative;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    height: 80px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin: 20px 30px 0;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.nav-logo {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    object-fit: cover;
+}
+.nav-title {
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+    background: linear-gradient(45deg, #00eaff, #d989ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.btn-back {
+    background: rgba(255, 255, 255, 0.5);
+    color: #475569;
+    border: 1px solid rgba(203, 213, 225, 0.5);
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: #1e293b;
+    transform: translateX(-3px);
+}
+
+.tabs {
+    background: rgba(255, 255, 255, 0.6);
+    padding: 8px;
+    border-radius: 50px;
+    display: flex;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    padding: 10px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+}
+.tab-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.5);
+}
+.tab-btn.active {
+    background: linear-gradient(135deg, #00eaff, #0096ff);
+    color: #000; /* Black text on bright button */
+    box-shadow: 0 4px 15px rgba(0, 234, 255, 0.3);
+}
+
+/* Area Konten Utama */
+.main-content {
+    flex: 1;
+    position: relative;
+    z-index: 10;
+    padding: 20px 30px 30px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.glass-panel {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    position: relative;
+    animation: fadeIn 0.8s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    height: 48px;
+    background: rgba(241, 245, 249, 0.5);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 10px;
+    position: relative;
+}
+
+.header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.sidebar-search {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 0 15px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(203, 213, 225, 0.6);
+}
+.sidebar-search i { color: #64748b; font-size: 0.9rem; }
+.sidebar-search input {
+    background: transparent;
+    border: none;
+    color: #1e293b;
+    padding: 12px 10px;
+    outline: none;
+    font-size: 0.9rem;
+    width: 100%;
+}
+.btn-icon {
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    color: #64748b;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon:hover { background: rgba(255, 255, 255, 0.8); color: #0ea5e9; }
+.btn-icon.has-notif { color: #ef4444; animation: shake 2s infinite; }
+.btn-icon .badge {
+    position: absolute; top: -5px; right: -5px;
+    background: #ef4444; color: white; font-size: 0.65rem; font-weight: bold;
+    padding: 2px 6px; border-radius: 10px; border: 2px solid #fff;
+}
+@keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+
+.window-controls { display: flex; gap: 8px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.red { background: #ff5f56; box-shadow: 0 0 10px rgba(255, 95, 86, 0.4); }
+.yellow { background: #ffbd2e; box-shadow: 0 0 10px rgba(255, 189, 46, 0.4); }
+.green { background: #27c93f; box-shadow: 0 0 10px rgba(39, 201, 63, 0.4); }
+
+.loading-line {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, #00eaff, #d989ff);
+    transition: width 0.5s ease, opacity 0.3s ease;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    flex: 1;
+    background: transparent;
+}
+
+.iframe-dark {
+    filter: invert(0.92) hue-rotate(180deg) contrast(0.9);
+}
+
+/* Sidebar PBJ */
+.pbj-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.pbj-sidebar {
+    width: 300px;
+    background: rgba(248, 250, 252, 0.5);
+    border-left: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 20px;
+    overflow-y: auto;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+}
+.pbj-sidebar h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #0ea5e9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.data-list { list-style: none; }
+.data-item { background: rgba(255, 255, 255, 0.6); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(226, 232, 240, 0.8); transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.data-item:hover { background: #f0f9ff; transform: translateX(5px); }
+.data-date { font-size: 0.75rem; color: #64748b; display: block; margin-bottom: 4px; }
+.data-title { font-size: 0.9rem; font-weight: 500; color: #1e293b; }
+
+.grouping-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(226, 232, 240, 0.8); font-size: 0.9rem; }
+.grouping-name { color: #475569; }
+.grouping-count { font-weight: bold; color: #0ea5e9; background: rgba(14, 165, 233, 0.1); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
+
+/* Chart Container */
+.chart-container { position: relative; height: 100%; width: 100%; }
+
+/* Native Table Styles (PBJ) */
+.native-table-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto; /* Paksa scroll horizontal aktif */
+    overflow-y: auto;
+    padding: 0;
+}
+.native-table {
+    width: max-content; /* Tabel akan melebar sesuai isi konten, tidak dipaksa 100% */
+    min-width: 100%;    /* Minimal selebar layar jika datanya sedikit */
+    border-collapse: collapse;
+    color: white;
+    font-size: 0.9rem;
+}
+.native-table th {
+    background: #fef9c3;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #854d0e;
+    z-index: 5;
+    border: 1px solid #ca8a04;
+    white-space: normal;
+    vertical-align: middle;
+    text-align: center;
+    min-width: 80px;
+    position: sticky; top: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.native-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+    color: #334155;
+    white-space: nowrap;
+}
+.native-table tr:hover {
+    background: rgba(241, 245, 249, 0.5);
+}
+
+.pbj-content-row {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+}
+
+.pbj-stats-row {
+    display: none;
+    padding: 20px;
+    background: rgba(241, 245, 249, 0.5);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    height: 320px;
+    flex-shrink: 0;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #94a3b8;
+    text-align: center;
+}
+.empty-state i {
+    font-size: 5rem;
+    margin-bottom: 25px;
+    background: linear-gradient(135deg, #ffffff, #888888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.3;
+}
+.empty-state h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #1e293b;
+}
+.empty-state p {
+    font-size: 1rem;
+    max-width: 400px;
+    line-height: 1.6;
+    color: #64748b;
+}
+
+/* Background Animation */
+.bg-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.6;
+    animation: float 10s infinite ease-in-out alternate;
+}
+.blob-1 {
+    top: -10%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: #a855f7;
+    animation-delay: 0s;
+    opacity: 0.4;
+}
+.blob-2 {
+    bottom: -10%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: #3b82f6;
+    animation-delay: -5s;
+    opacity: 0.4;
+}
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 50px) scale(1.1); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Grid Pattern */
+.bg-grid {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 1;
+    pointer-events: none;
+    mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+}
+
+/* RPD Sub Navigation (Slide Toggle) */
+.rpd-sub-nav {
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.5);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.rpd-sub-btn {
+    padding: 8px 16px;
+    border: 1px solid rgba(203, 213, 225, 0.8);
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.rpd-sub-btn:hover {
+    background: white;
+    color: #eab308;
+}
+.rpd-sub-btn.active {
+    background: linear-gradient(135deg, #facc15, #eab308);
+    color: #422006;
+    border: none;
+    box-shadow: 0 4px 10px rgba(234, 179, 8, 0.3);
+}
+
+/* RPD Dashboard Styles */
+.rpd-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+.rpd-card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+.rpd-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.rpd-card-title {
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+.rpd-card-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ca8a04;
+    overflow-wrap: break-word;
+}
+.rpd-card-sub {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+.rpd-charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 30px;
+}
+.rpd-chart-card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    height: 350px;
+    position: relative;
+}
+.rpd-chart-header {
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+@media (max-width: 768px) {
+    .rpd-charts-container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    <div class="bg-grid"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" style="position: fixed; bottom: 30px; right: 30px; background: #10b981; color: white; padding: 12px 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-check-circle"></i> <span id="toastMsg">Berhasil</span>
+    </div>
+
+    <script>
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        toast.style.background = isError ? '#ef4444' : '#10b981';
+        toastMsg.innerText = msg;
+        toast.style.transform = 'translateY(0)';
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.transform = 'translateY(100px)';
+            toast.style.opacity = '0';
+        }, 3000);
+    }
+    </script>
+
+    <!-- Navigasi Atas -->
+    <div class="navbar">
+        <div class="nav-brand">
+            <img src="https://yt3.ggpht.com/a/AATXAJwDikBj_PcvGKe5caluqknHoXgqXk7I5vY1CqY9=s900-c-k-c0xffffffff-no-rj-mo" alt="Logo" class="nav-logo">
+            <div class="nav-title">Dashboard System</div>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('RPD')">RPD</button>
+            <button class="tab-btn" onclick="switchTab('LRA')">LRA</button>
+            <button class="tab-btn" onclick="switchTab('PBJ')">PBJ</button>
+            <button class="tab-btn" onclick="switchTab('E-PERWABKU')">E-PERWABKU</button>
+        </div>
+        <a href="index.html" class="btn-back"><i class="fas fa-home"></i> Kembali</a>
+    </div>
+
+    <!-- Area Tampilan Dashboard -->
+    <div class="main-content">
+        <div class="glass-panel" id="dashboardContainer">
+            <div class="panel-header">
+                <div class="window-controls">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" id="notifBtn" onclick="toggleNotifPopup()" style="display: none;" title="Peringatan Kontrak">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="btn-icon" onclick="testNotification()" title="Coba Simulasi Notifikasi">
+                        <i class="fas fa-vial"></i>
+                    </button>
+                    <button class="btn-icon" onclick="toggleDarkMode()" title="Mode Gelap / Terang">
+                        <i class="fas fa-adjust"></i>
+                    </button>
+                    <button class="btn-icon" onclick="refreshIframe()" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+    <button class="btn-icon" onclick="manualSync()" title="Sinkronisasi Cloud (Ambil Data Terbaru)">
+        <i class="fas fa-cloud-download-alt"></i>
+    </button>
+                </div>
+                <div class="loading-line" id="loadingLine"></div>
+            </div>
+            <!-- Iframe akan muncul di sini -->
+            <div id="iframeWrapper" class="pbj-layout">
+                <!-- Top Stats Section (PBJ) -->
+                <div id="pbjStatsRow" class="pbj-stats-row" style="height: auto; min-height: 380px; display: none; flex-direction: column;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+                        <button class="rpd-sub-btn active" onclick="switchPBJView('stats')" id="btnPbjStats"><i class="fas fa-chart-pie"></i> Statistik Umum</button>
+                        <button class="rpd-sub-btn" onclick="switchPBJView('monthly')" id="btnPbjMonthly"><i class="fas fa-calendar-alt"></i> Jadwal Pencairan (Per CV)</button>
+                    </div>
+
+                    <div id="pbjStatsContent" style="display: flex; gap: 30px; height: 300px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                            <h3 style="margin-bottom: 15px; color: #0ea5e9; font-size: 1.1rem;"><i class="fas fa-chart-pie"></i> Statistik Visual</h3>
+                            <div style="flex: 1; position: relative;">
+                                <canvas id="pbjChart"></canvas>
+                            </div>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                            <h3 style="margin-bottom: 15px; color: #0ea5e9; font-size: 1.1rem;"><i class="fas fa-list-ol"></i> Rincian Statistik</h3>
+                            <div id="groupingList" style="flex: 1; overflow-y: auto; padding-right: 5px;"></div>
+                        </div>
+                    </div>
+
+                    <div id="pbjMonthlyContent" style="display: none; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding-bottom: 10px;">
+                        <!-- Monthly Cards injected here -->
+                    </div>
+                </div>
+                
+                <div class="pbj-content-row">
+                    <div id="iframeContainer" style="flex: 1; position: relative; height: 100%; overflow: hidden;">
+                        <div class="empty-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Memuat data...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar 7 Data Terbaru (Khusus PBJ) -->
+                    <div class="pbj-sidebar" id="pbjSidebar">
+                        <h3><i class="fas fa-clock"></i> 7 Data Terbaru</h3>
+                        <div class="sidebar-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Cari di tabel..." onkeyup="filterTable(this.value)">
+                        </div>
+                        <div class="sidebar-search">
+                            <i class="fas fa-hashtag"></i>
+                            <input type="number" placeholder="Grafik per No. Urut..." oninput="updateChartByRow(this.value)">
+                        </div>
+                        <ul class="data-list" id="latestDataList">
+                            <!-- Data akan diisi oleh JS -->
+                        </ul>
+                        <div id="subsatkerContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 'RPD';
+        window.smartTableData = []; // Menyimpan data mentah tabel (PBJ/E-PERWABKU)
+
+        // KONFIGURASI CLOUD
+        // KEAMANAN: Saat ini masih pakai Master Key ($2a$). Sangat disarankan buat "Access Key" (Read Only) di JSONBin.io
+        // lalu ganti API_KEY di bawah ini dengan Access Key tersebut agar data tidak bisa dihapus orang lain.
+        const CLOUD_CONFIG = {
+            BIN_ID: '694b67bd43b1c97be901e66c', // Bin ID Anda
+            API_KEY: '$2a$10$h08CHo/2k.EXdddjlF1Jj.wgLWCrn5ygHtQqUzOj7fZxG5RFYTYl6' // Ganti dengan Access Key (Read Only) nanti
+        };
+
+        async function syncFromCloud() {
+            if (!CLOUD_CONFIG.BIN_ID || !CLOUD_CONFIG.API_KEY) return false;
+            const binId = CLOUD_CONFIG.BIN_ID.trim();
+            const apiKey = CLOUD_CONFIG.API_KEY.trim();
+
+            if (!binId || !apiKey) return false;
+            try {
+                // Otomatis deteksi: Master Key ($2a$) pakai X-Master-Key, Access Key ($2b$) pakai X-Access-Key
+                const headerKey = apiKey.startsWith('$2a$') ? 'X-Master-Key' : 'X-Access-Key';
+                // Tambahkan timestamp dan cache: no-store agar selalu mengambil data terbaru
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest?t=${new Date().getTime()}`, {
+                    headers: { 
+                        [headerKey]: apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    cache: 'no-store'
+                });
+                if (res.ok) {
+                    const json = await res.json();
+                    const data = json.record;
+                    if (data && typeof data === 'object') {
+                        Object.keys(data).forEach(key => {
+                            let val = data[key];
+                            // Pastikan object dikonversi ke string agar localStorage aman
+                            if (typeof val === 'object' && val !== null) val = JSON.stringify(val);
+                            if (val !== null && val !== undefined) {
+                                localStorage.setItem(key, val);
+                            } else {
+                                // PERBAIKAN: Hapus data di perangkat User jika data di Admin sudah dihapus (null)
+                                localStorage.removeItem(key);
+                            }
+                        });
+                    }
+                    return true;
+                } else {
+                    console.error("Cloud Error:", res.status);
+                    return false;
+                }
+            } catch (e) { 
+                console.error("Gagal sync cloud:", e); 
+                return false;
+            }
+        }
+
+        // Load tab pertama saat halaman dibuka
+        window.onload = async function() {
+            const success = await syncFromCloud();
+            if (success) {
+                console.log("Data cloud berhasil dimuat");
+            } else {
+                console.log("Menggunakan data lokal (Cloud gagal/kosong)");
+            }
+            
+            // Handle URL Params (Redirect dari Notifikasi)
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            const searchParam = urlParams.get('search');
+
+            if (tabParam) {
+                switchTab(tabParam);
+            } else {
+                switchTab('RPD');
+            }
+
+            if (searchParam && tabParam === 'PBJ') {
+                const checkInterval = setInterval(() => {
+                    const searchInput = document.querySelector('.sidebar-search input[placeholder="Cari di tabel..."]');
+                    if (window.smartTableData && window.smartTableData.length > 0 && searchInput) {
+                        searchInput.value = searchParam;
+                        filterTable(searchParam);
+                        clearInterval(checkInterval);
+                        showToast(`Menampilkan data: ${searchParam}`);
+                    }
+                }, 500);
+                setTimeout(() => clearInterval(checkInterval), 15000);
+            }
+
+            // --- FITUR OTOMATIS: Background Check & Permission ---
+            if ("Notification" in window) {
+                // Minta izin notifikasi saat user pertama kali klik di mana saja
+                if (Notification.permission === "default") {
+                    const requestPerm = () => {
+                        Notification.requestPermission();
+                        document.removeEventListener('click', requestPerm);
+                    };
+                    document.addEventListener('click', requestPerm);
+                }
+                
+                // Jalankan cek notifikasi di background (meski tidak sedang di tab PBJ)
+                runBackgroundNotificationCheck();
+                // Cek ulang setiap 30 menit secara otomatis
+                setInterval(runBackgroundNotificationCheck, 30 * 60 * 1000);
+            }
+        }
+
+        async function manualSync() {
+            const btn = document.querySelector('button[onclick="manualSync()"] i');
+            btn.classList.add('fa-spin');
+            
+            const success = await syncFromCloud();
+            
+            btn.classList.remove('fa-spin');
+            if (success) {
+                showToast("Data berhasil diperbarui dari Cloud!");
+                switchTab(currentSection); // Refresh tampilan saat ini
+            } else {
+                showToast("Gagal mengambil data. Cek koneksi.", true);
+            }
+        }
+
+        function switchTab(section) {
+            currentSection = section;
+            
+            // Loading Animation
+            const loader = document.getElementById('loadingLine');
+            loader.style.width = '0%';
+            loader.style.opacity = '1';
+            setTimeout(() => { loader.style.width = '60%'; }, 50);
+            
+            // Update UI Tab
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText === section) btn.classList.add('active');
+            });
+
+            // Handle PBJ Specific UI
+            const pbjSidebar = document.getElementById('pbjSidebar');
+            const pbjStatsRow = document.getElementById('pbjStatsRow');
+            const dashboardContainer = document.getElementById('dashboardContainer');
+            
+            if (section === 'PBJ' || section === 'E-PERWABKU') {
+                pbjSidebar.style.display = 'flex';
+                pbjStatsRow.style.display = 'flex';
+                
+                // Bersihkan tampilan lama saat berpindah tab
+                if (pbjChartInstance) { pbjChartInstance.destroy(); pbjChartInstance = null; }
+                document.getElementById('groupingList').innerHTML = '';
+                document.getElementById('latestDataList').innerHTML = '';
+                document.getElementById('subsatkerContainer').innerHTML = '';
+
+                // Coba load Smart View (Native Table)
+                const savedUrl = localStorage.getItem(section + '_Url');
+                if (savedUrl && savedUrl !== 'null' && savedUrl !== 'undefined') {
+                    loadSmartData(savedUrl, section);
+                } else {
+                    showEmptyState(section);
+                }
+                return; // Stop execution here for PBJ to avoid double loading iframe
+            } else {
+                pbjSidebar.style.display = 'none';
+                pbjStatsRow.style.display = 'none';
+            }
+
+            // Ambil URL dari LocalStorage
+            const savedUrl = localStorage.getItem(section + '_Url');
+            if (section === 'RPD') {
+                loadRPDView(savedUrl);
+            } else if (section === 'LRA') {
+                loadLRAView(savedUrl);
+            } else {
+                loadIframeView(savedUrl, section);
+            }
+        }
+
+        function loadIframeView(url, section) {
+            const container = document.getElementById('iframeContainer');
+            const loader = document.getElementById('loadingLine');
+
+            if (url && url !== 'null' && url !== 'undefined') {
+                // Format URL agar tampilan tabel Google Sheet lebih bersih (Preview Mode)
+                let cleanUrl = url;
+                if (cleanUrl.includes('docs.google.com/spreadsheets')) {
+                    // Ubah /edit menjadi /preview untuk tampilan tabel yang lebih rapi
+                    cleanUrl = cleanUrl.replace(/\/edit.*$/, '/preview');
+                }
+
+                // Jika ada URL, tampilkan iframe
+                container.innerHTML = `<iframe src="${cleanUrl}" allowfullscreen></iframe>`;
+                // Finish loading
+                setTimeout(() => { loader.style.width = '100%'; }, 300);
+                setTimeout(() => { loader.style.opacity = '0'; }, 800);
+            } else {
+                // Jika tidak ada URL, tampilkan pesan error
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h2>Data ${section} Belum Tersedia</h2>
+                        <p>Admin belum mengatur link untuk bagian ini.</p>
+                    </div>
+                `;
+                loader.style.width = '100%';
+                setTimeout(() => { loader.style.opacity = '0'; }, 500);
+            }
+        }
+
+        function showEmptyState(section) {
+            const container = document.getElementById('iframeContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h2>Data ${section} Belum Tersedia</h2>
+                    <p>Admin belum mengatur link untuk bagian ini.</p>
+                </div>
+            `;
+        }
+
+        function toggleDarkMode() {
+            const iframe = document.querySelector('iframe');
+            if (iframe) iframe.classList.toggle('iframe-dark');
+        }
+
+        function refreshIframe() {
+            const iframe = document.querySelector('iframe');
+            if (iframe) iframe.src = iframe.src;
+        }
+
+        // --- LOGIKA RPD (Pencairan & Kesimpulan) ---
+        async function loadRPDView(url) {
+            const container = document.getElementById('iframeContainer');
+            const loader = document.getElementById('loadingLine');
+            
+            if (!url || url === 'null' || url === 'undefined') {
+                showEmptyState('RPD');
+                return;
+            }
+
+            let cleanUrl = url;
+            if (cleanUrl.includes('docs.google.com/spreadsheets')) {
+                cleanUrl = cleanUrl.replace(/\/edit.*$/, '/preview');
+            }
+
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; height: 100%;">
+                    <div class="rpd-sub-nav">
+                        <button onclick="switchRPDSubTab('iframe')" id="btnRpdIframe" class="rpd-sub-btn active">
+                            <i class="fas fa-file-excel"></i> Spreadsheet (Pencairan)
+                        </button>
+                        <button onclick="switchRPDSubTab('dashboard')" id="btnRpdDashboard" class="rpd-sub-btn">
+                            <i class="fas fa-chart-line"></i> Analisis Detail & Tren
+                        </button>
+                    </div>
+                    
+                    <div style="flex: 1; position: relative; overflow: hidden;">
+                        <div id="rpdIframeView" style="width:100%; height:100%; display:block;">
+                            <iframe src="${cleanUrl}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>
+                        </div>
+                        
+                        <div id="rpdDashboardView" style="width:100%; height:100%; display:none; background:#f8fafc; flex-direction:column; overflow-y: auto; padding: 20px;">
+                            <div id="rpdContent">
+                                <div class="empty-state" style="height: 300px;"><i class="fas fa-spinner fa-spin"></i><p>Menganalisis data RPD...</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => { loader.style.width = '100%'; }, 300);
+            setTimeout(() => { loader.style.opacity = '0'; }, 800);
+
+            const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (match) {
+                const sheetId = match[1];
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+                try {
+                    const response = await fetch(csvUrl);
+                    const csvText = await response.text();
+                    const rows = parseCSV(csvText);
+                    updateRPDDashboard(rows);
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('rpdContent').innerHTML = '<div style="text-align:center; color:#ef4444;">Gagal memuat data analisis. Pastikan link spreadsheet publik/benar.</div>';
+                }
+            }
+        }
+
+        function switchRPDSubTab(mode) {
+            const btnIframe = document.getElementById('btnRpdIframe');
+            const btnDash = document.getElementById('btnRpdDashboard');
+            const viewIframe = document.getElementById('rpdIframeView');
+            const viewDash = document.getElementById('rpdDashboardView');
+
+            if (mode === 'iframe') {
+                btnIframe.classList.add('active');
+                btnDash.classList.remove('active');
+                viewIframe.style.display = 'block';
+                viewDash.style.display = 'none';
+            } else {
+                btnIframe.classList.remove('active');
+                btnDash.classList.add('active');
+                viewIframe.style.display = 'none';
+                viewDash.style.display = 'flex';
+            }
+        }
+
+        function updateRPDDashboard(rows) {
+            const container = document.getElementById('rpdContent');
+            if (!rows || rows.length < 2) { container.innerHTML = 'Data tidak cukup.'; return; }
+
+            const headers = rows[0].map(h => h.toUpperCase());
+            
+            // 1. Identifikasi Kolom Penting (12 Bulan)
+            const months = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
+            const monthIndices = {};
+            months.forEach(m => {
+                const idx = headers.findIndex(h => h.includes(m));
+                if (idx !== -1) monthIndices[m] = idx;
+            });
+
+            let nameIdx = headers.findIndex(h => h.includes('URAIAN') || h.includes('KEGIATAN') || h.includes('NAMA') || h.includes('PROGRAM'));
+            if(nameIdx === -1) nameIdx = 1; // Fallback
+
+            let paguIdx = headers.findIndex(h => h.includes('PAGU') || h.includes('ANGGARAN') || h.includes('TOTAL') || h.includes('JUMLAH BIAYA'));
+            
+            // 2. Proses Data Detail
+            let totalPagu = 0;
+            let totalRealisasi = 0;
+            let monthlyTotals = {};
+            months.forEach(m => monthlyTotals[m] = 0);
+
+            const detailedData = [];
+
+            for(let i=1; i<rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.length === 0) continue;
+
+                // Skip baris total/jumlah dari spreadsheet jika ada
+                const firstCell = (row[0]||'').toString().toUpperCase();
+                if(firstCell.includes('TOTAL') || firstCell.includes('JUMLAH')) continue;
+
+                const item = {
+                    name: row[nameIdx] || 'Tanpa Nama',
+                    pagu: 0,
+                    months: {}
+                };
+
+                // Ambil Pagu
+                if (paguIdx !== -1 && row[paguIdx]) {
+                    let val = parseFloat(row[paguIdx].replace(/[^0-9,-]+/g,"").replace(',','.'));
+                    if (!isNaN(val)) {
+                        item.pagu = val;
+                        totalPagu += val;
+                    }
+                }
+
+                // Ambil Data Bulanan
+                let rowRealization = 0;
+                months.forEach(m => {
+                    const idx = monthIndices[m];
+                    let val = 0;
+                    if (idx !== undefined && row[idx]) {
+                         let clean = row[idx].replace(/[^0-9,-]+/g,"").replace(',','.');
+                         val = parseFloat(clean);
+                         if (isNaN(val)) val = 0;
+                    }
+                    item.months[m] = val;
+                    monthlyTotals[m] += val;
+                    rowRealization += val;
+                });
+
+                totalRealisasi += rowRealization;
+                detailedData.push(item);
+            }
+
+            const sisaAnggaran = totalPagu - totalRealisasi;
+            const fmt = (n) => 'Rp ' + n.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+            // 3. Render HTML Detail
+            let html = `
+                <div class="rpd-dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                    <div class="rpd-card" style="border-left: 5px solid #3b82f6;">
+                        <div class="rpd-card-title">TOTAL PAGU ANGGARAN</div>
+                        <div class="rpd-card-value" style="color: #2563eb;">${fmt(totalPagu)}</div>
+                    </div>
+                    <div class="rpd-card" style="border-left: 5px solid #10b981;">
+                        <div class="rpd-card-title">TOTAL REALISASI (CAIR)</div>
+                        <div class="rpd-card-value" style="color: #059669;">${fmt(totalRealisasi)}</div>
+                        <div class="rpd-card-sub">${totalPagu > 0 ? ((totalRealisasi/totalPagu)*100).toFixed(2) : 0}% dari Pagu</div>
+                    </div>
+                    <div class="rpd-card" style="border-left: 5px solid #f59e0b;">
+                        <div class="rpd-card-title">SISA ANGGARAN</div>
+                        <div class="rpd-card-value" style="color: #d97706;">${fmt(sisaAnggaran)}</div>
+                    </div>
+                </div>
+
+                <div class="rpd-chart-card" style="height: 400px; margin-bottom: 30px;">
+                    <div class="rpd-chart-header"><i class="fas fa-chart-line" style="color:#3b82f6;"></i> Tren Pencairan Bulanan</div>
+                    <div style="position: relative; height: 340px; width: 100%;">
+                        <canvas id="rpdTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0;">
+                    <h3 style="color: #1e293b; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-table"></i> Matriks Rincian Pencairan
+                    </h3>
+                    <div style="overflow-x: auto; border: 1px solid #f1f5f9; border-radius: 8px; max-height: 600px;">
+                        <table class="native-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead style="background: #f8fafc; position: sticky; top: 0; z-index: 20;">
+                                <tr>
+                                    <th style="position:sticky; left:0; z-index:30; background:#f8fafc; border-right: 2px solid #e2e8f0; min-width: 250px; text-align: left; padding-left: 15px;">Uraian Kegiatan</th>
+                                    <th style="min-width: 120px; background:#f8fafc;">Pagu</th>
+                                    ${months.map(m => `<th style="min-width: 100px; background:#f8fafc;">${m.substring(0,3)}</th>`).join('')}
+                                    <th style="min-width: 120px; background:#f8fafc;">Total Cair</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${detailedData.map(item => {
+                                    let rowTotal = Object.values(item.months).reduce((a,b)=>a+b,0);
+                                    return `
+                                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                                        <td style="padding: 10px 15px; color: #334155; position:sticky; left:0; background:white; border-right: 2px solid #e2e8f0; font-weight:500;">${item.name}</td>
+                                        <td style="padding: 10px 15px; text-align: right;">${fmt(item.pagu)}</td>
+                                        ${months.map(m => `<td style="padding: 10px 15px; text-align: right; color: ${item.months[m]>0 ? '#10b981' : '#cbd5e1'}; font-weight: ${item.months[m]>0 ? '600' : '400'};">${item.months[m] > 0 ? fmt(item.months[m]) : '-'}</td>`).join('')}
+                                        <td style="padding: 10px 15px; text-align: right; font-weight:600; color:#2563eb;">${fmt(rowTotal)}</td>
+                                    </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                            <tfoot style="background: #fefce8; font-weight: 700; position: sticky; bottom: 0; z-index: 20;">
+                                <tr>
+                                    <td style="padding: 12px 15px; position:sticky; left:0; background:#fefce8; border-right: 2px solid #e2e8f0;">TOTAL</td>
+                                    <td style="padding: 12px 15px; text-align: right;">${fmt(totalPagu)}</td>
+                                    ${months.map(m => `<td style="padding: 12px 15px; text-align: right;">${fmt(monthlyTotals[m])}</td>`).join('')}
+                                    <td style="padding: 12px 15px; text-align: right;">${fmt(totalRealisasi)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+
+            // Render Chart
+            const ctx = document.getElementById('rpdTrendChart');
+            if(ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Realisasi Pencairan',
+                            data: months.map(m => monthlyTotals[m]),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#3b82f6',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(context.raw);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'Rp ' + (value / 1000000).toLocaleString('id-ID') + ' Jt';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        const detailChartInstances = {};
+
+        function renderDetailView(title, headerRows, rows, containerId = 'rpdDetailSection') {
+            const container = document.getElementById(containerId);
+            if(!container) return;
+            
+            container.style.display = 'block';
+            setTimeout(() => container.scrollIntoView({ behavior: 'smooth' }), 100);
+
+            // Flatten headers untuk keperluan chart logic (menggabungkan teks header multi-row)
+            const flatHeaders = headerRows[0].map((h, i) => {
+                let text = h;
+                for(let r=1; r<headerRows.length; r++) {
+                    if(headerRows[r][i]) text += ' ' + headerRows[r][i];
+                }
+                return text;
+            });
+
+            // Persiapan Data Chart
+            // Cari kolom nilai (angka) dan nama item
+            let nameIdx = 1; 
+            let valIdx = -1;
+            
+            const moneyKeywords = ['jumlah', 'total', 'pagu', 'nilai', 'biaya', 'anggaran', 'harga'];
+            valIdx = flatHeaders.findIndex(h => moneyKeywords.some(k => h.toLowerCase().includes(k)));
+            
+            if(valIdx === -1 && rows.length > 0) {
+                // Fallback: cari kolom angka pertama
+                for(let c=0; c<flatHeaders.length; c++) {
+                     const cell = rows[0][c];
+                     if(cell && !isNaN(parseFloat(cell.replace(/[^0-9,-]+/g,"")))) {
+                         valIdx = c; break;
+                     }
+                }
+            }
+            if(valIdx === -1) valIdx = flatHeaders.length - 1;
+
+            const chartData = [];
+            
+            rows.forEach(row => {
+                if(!row || row.length <= valIdx) return;
+                let name = row[nameIdx] || row[0] || 'Item';
+                let valStr = row[valIdx];
+                if(valStr) {
+                    let val = parseFloat(valStr.replace(/Rp\.?\s?/gi, '').replace(/\./g, '').replace(',', '.'));
+                    if(!isNaN(val) && val > 0) {
+                        chartData.push({
+                            label: name.length > 20 ? name.substring(0,20)+'...' : name,
+                            value: val
+                        });
+                    }
+                }
+            });
+
+            // Sort Descending & Take Top 10 for Charts (Agar grafik tidak penuh sesak)
+            chartData.sort((a, b) => b.value - a.value);
+            const topChartData = chartData.slice(0, 10);
+            const labels = topChartData.map(d => d.label);
+            const values = topChartData.map(d => d.value);
+            
+            // Hitung maxCols untuk tabel detail
+            const maxCols = flatHeaders.length;
+
+            // Unique IDs for charts based on container (Agar LRA dan RPD tidak bentrok)
+            const barChartId = containerId + '_barChart';
+            const pieChartId = containerId + '_pieChart';
+
+            // HTML Template
+            let html = `
+                <div style="background: white; border-radius: 16px; border: 1px solid #eab308; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);">
+                    <div style="background: #fefce8; padding: 15px 25px; border-bottom: 1px solid #fde047; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="color: #854d0e; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-folder-open"></i> Rincian: <strong>${title}</strong>
+                        </h3>
+                        <button onclick="document.getElementById('${containerId}').style.display='none'" style="background: transparent; border: none; color: #854d0e; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div style="padding: 25px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                            <div style="height: 300px; position: relative; border: 1px solid #f1f5f9; border-radius: 12px; padding: 10px;">
+                                <canvas id="${barChartId}"></canvas>
+                            </div>
+                            <div style="height: 300px; position: relative; border: 1px solid #f1f5f9; border-radius: 12px; padding: 10px;">
+                                <canvas id="${pieChartId}"></canvas>
+                            </div>
+                        </div>
+                        <div style="overflow-x: auto; max-height: 500px; overflow-y: auto; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <table class="native-table" style="width: max-content; min-width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                                <thead style="background: #fef9c3;">
+                                    ${generateTableHeaders(headerRows)}
+                                </thead>
+                                <tbody>
+                                    ${rows.filter(r => r.length > 1 || (r[0] && r[0].trim() !== '')).map(row => `<tr style="border-bottom: 1px solid #f1f5f9;">${Array.from({length: maxCols}).map((_, idx) => `<td style="padding: 10px 15px; color: #334155; white-space: nowrap;">${row[idx] !== undefined ? row[idx] : ''}</td>`).join('')}</tr>`).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            // Render Charts
+            if (!detailChartInstances[containerId]) detailChartInstances[containerId] = {};
+            if (detailChartInstances[containerId].bar) detailChartInstances[containerId].bar.destroy();
+            if (detailChartInstances[containerId].pie) detailChartInstances[containerId].pie.destroy();
+
+            // Gradient untuk Bar Chart Detail
+            const ctx1 = document.getElementById(barChartId);
+            if(ctx1) {
+                const ctx = ctx1.getContext('2d');
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, '#facc15');
+                gradient.addColorStop(1, '#ca8a04');
+
+                detailChartInstances[containerId].bar = new Chart(ctx1, { 
+                    type: 'bar', 
+                    data: { 
+                        labels: labels, 
+                        datasets: [{ 
+                            label: 'Nominal', 
+                            data: values, 
+                            backgroundColor: gradient, 
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        }] 
+                    }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { display: false }, 
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1e293b',
+                                bodyColor: '#1e293b',
+                                borderColor: '#e2e8f0',
+                                borderWidth: 1,
+                                callbacks: { label: (c) => ' ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(c.raw) }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' }, ticks: { font: { size: 10 } }, title: { display: true, text: 'Nominal (Rp)' } },
+                            x: { grid: { display: false }, ticks: { display: true, font: { size: 10 }, maxRotation: 45, minRotation: 0 } }
+                        }
+                    } 
+                });
+            }
+
+            const ctx2 = document.getElementById(pieChartId);
+            if(ctx2) {
+                detailChartInstances[containerId].pie = new Chart(ctx2, { 
+                    type: 'doughnut', 
+                    data: { 
+                        labels: labels, 
+                        datasets: [{ 
+                            data: values, 
+                            backgroundColor: ['#eab308', '#f59e0b', '#d97706', '#b45309', '#78350f', '#fbbf24'], 
+                            borderWidth: 2,
+                            borderColor: '#ffffff',
+                            hoverOffset: 8
+                        }] 
+                    }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        layout: { padding: 10 },
+                        plugins: { 
+                            legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true, font: { size: 10 } } },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                bodyColor: '#1e293b',
+                                borderColor: '#e2e8f0',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: function(context) {
+                                        let value = context.raw;
+                                        let total = context.chart._metasets[context.datasetIndex].total;
+                                        let percentage = Math.round((value / total) * 100) + '%';
+                                        return ' ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value) + ' (' + percentage + ')';
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    } 
+                });
+            }
+        }
+
+        // --- LOGIKA SMART TABLE (PBJ) ---
+
+        async function loadSmartData(url, section) {
+            const container = document.getElementById('iframeContainer');
+            const loader = document.getElementById('loadingLine');
+            
+            // Regex untuk ambil ID Spreadsheet
+            const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            
+            // Jika bukan link Google Sheet valid, fallback ke Iframe biasa
+            if (!match) {
+                loadIframeView(url, section);
+                loadSidebarDataFromStorage(section); // Load sidebar manual
+                return;
+            }
+
+            const sheetId = match[1];
+            // URL untuk ambil data CSV (Google Visualization API)
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+
+            try {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Mengambil data tabel...</p></div>`;
+                
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error("Gagal akses spreadsheet");
+                
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+                window.smartTableData = rows; // Simpan ke global variable
+
+                checkContractDeadlines(rows); // Cek notifikasi kontrak berakhir
+                renderNativeTable(rows);
+                populateSidebarFromTable(rows);
+                processAndRenderStats(rows);
+                renderSubsatkerTable(rows);
+                renderPBJMonthlySchedule(rows);
+
+                // Finish loading
+                setTimeout(() => { loader.style.width = '100%'; }, 300);
+                setTimeout(() => { loader.style.opacity = '0'; }, 800);
+
+            } catch (error) {
+                console.error("Error fetching sheet:", error);
+                // Jika gagal (misal sheet private), fallback ke Iframe
+                loadIframeView(url, section);
+                loadSidebarDataFromStorage(section);
+            }
+        }
+
+        function switchPBJView(view) {
+            const btnStats = document.getElementById('btnPbjStats');
+            const btnMonthly = document.getElementById('btnPbjMonthly');
+            const contentStats = document.getElementById('pbjStatsContent');
+            const contentMonthly = document.getElementById('pbjMonthlyContent');
+
+            if (view === 'stats') {
+                btnStats.classList.add('active');
+                btnMonthly.classList.remove('active');
+                contentStats.style.display = 'flex';
+                contentMonthly.style.display = 'none';
+            } else {
+                btnStats.classList.remove('active');
+                btnMonthly.classList.add('active');
+                contentStats.style.display = 'none';
+                contentMonthly.style.display = 'grid';
+            }
+        }
+
+        function renderPBJMonthlySchedule(rows) {
+            const container = document.getElementById('pbjMonthlyContent');
+            if (!rows || rows.length < 2) return;
+
+            const headers = rows[0].map(h => h.toUpperCase());
+            const months = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
+            
+            // Find Month Columns
+            const monthIndices = {};
+            let foundMonths = false;
+            months.forEach(m => {
+                const idx = headers.findIndex(h => h.includes(m));
+                if (idx !== -1) {
+                    monthIndices[m] = idx;
+                    foundMonths = true;
+                }
+            });
+
+            if (!foundMonths) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px; background: #f1f5f9; border-radius: 12px;">Tidak ditemukan kolom bulan (Januari-Desember) pada data ini untuk menampilkan jadwal pencairan.</div>';
+                return;
+            }
+
+            // Find Vendor Column
+            let vendorIdx = headers.findIndex(h => h.includes('PENYEDIA') || h.includes('PELAKSANA') || h.includes('REKANAN') || h.includes('CV') || h.includes('PT') || h.includes('NAMA PERUSAHAAN'));
+            if (vendorIdx === -1) vendorIdx = headers.findIndex(h => h.includes('URAIAN') || h.includes('NAMA'));
+            if (vendorIdx === -1) vendorIdx = 1;
+
+            const schedule = {};
+            months.forEach(m => schedule[m] = []);
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const vendorName = row[vendorIdx] || 'Tanpa Nama';
+                
+                months.forEach(m => {
+                    const idx = monthIndices[m];
+                    if (idx !== undefined && row[idx]) {
+                        let valStr = row[idx].toString().replace(/[^0-9,-]+/g,"").replace(',','.');
+                        let val = parseFloat(valStr);
+                        if (!isNaN(val) && val > 0) {
+                            schedule[m].push({ name: vendorName, value: val });
+                        }
+                    }
+                });
+            }
+
+            let html = '';
+            const fmt = (n) => 'Rp ' + n.toLocaleString('id-ID');
+
+            months.forEach(m => {
+                const items = schedule[m];
+                if (items.length > 0) {
+                    let listHtml = '';
+                    let totalMonth = 0;
+                    items.forEach(item => {
+                        totalMonth += item.value;
+                        listHtml += `<div style="display: flex; justify-content: space-between; font-size: 0.85rem; padding: 8px 0; border-bottom: 1px solid #f1f5f9;"><span style="color: #334155; font-weight: 500; max-width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span><span style="color: #0ea5e9; font-weight: 600;">${fmt(item.value)}</span></div>`;
+                    });
+                    html += `<div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;"><h4 style="color: #0f172a; font-weight: 700; font-size: 1rem; display:flex; align-items:center; gap:8px;"><i class="fas fa-calendar-day" style="color:#3b82f6;"></i> ${m}</h4><span style="background: #e0f2fe; color: #0284c7; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 700;">${items.length} CV</span></div><div style="flex: 1; overflow-y: auto; max-height: 250px; margin-bottom: 15px; padding-right: 5px;">${listHtml}</div><div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #f1f5f9; text-align: right; font-size: 0.95rem; font-weight: 700; color: #10b981;">Total: ${fmt(totalMonth)}</div></div>`;
+                }
+            });
+
+            if (html === '') html = '<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px; background: #f1f5f9; border-radius: 12px;">Tidak ada data pencairan ditemukan pada kolom bulan.</div>';
+            container.innerHTML = html;
+        }
+
+        function parseCSV(str) {
+            // Parser CSV sederhana
+            const arr = [];
+            let quote = false;
+            let col = 0, row = 0;
+
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || [];
+                arr[row][col] = arr[row][col] || '';
+
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; }
+                else if (cc == '"') { quote = !quote; }
+                else if (cc == ',' && !quote) { ++col; }
+                else if ((cc == '\r' && nc == '\n' && !quote) || (cc == '\n' && !quote)) { ++row; col = 0; if (cc == '\r') ++c; }
+                else { arr[row][col] += cc; }
+            }
+            return arr;
+        }
+
+        function renderNativeTable(rows) {
+            const container = document.getElementById('iframeContainer');
+            if (rows.length === 0) return;
+
+            let html = '<div class="native-table-wrapper"><table class="native-table" id="pbjTable">';
+            
+            // Header (Baris pertama)
+            html += '<thead><tr>';
+            rows[0].forEach(cell => {
+                let style = '';
+                const c = (cell||'').toString().toLowerCase().trim();
+                // Deteksi kolom No agar tidak terlalu lebar, dan kolom Nama agar cukup lebar
+                if(c === 'no' || c === 'no.' || c === 'nomor') style = 'width: 50px; min-width: 50px; text-align: center;';
+                else if(c.includes('nama') || c.includes('uraian') || c.includes('pekerjaan') || c.includes('paket')) style = 'min-width: 300px;';
+                html += `<th style="${style}">${cell}</th>`;
+            });
+            html += '</tr></thead>';
+
+            // Body (Baris selanjutnya)
+            html += '<tbody>';
+            for (let i = 1; i < rows.length; i++) {
+                // Skip baris kosong
+                if (rows[i].length === 1 && rows[i][0] === '') continue;
+                
+                html += '<tr>';
+                rows[i].forEach(cell => {
+                    html += `<td>${cell}</td>`;
+                });
+                html += '</tr>';
+            }
+            html += '</tbody></table></div>';
+
+            container.innerHTML = html;
+        }
+
+        function populateSidebarFromTable(rows) {
+            const list = document.getElementById('latestDataList');
+            list.innerHTML = '';
+            
+            // Ambil 7 baris pertama (setelah header)
+            // Asumsi kolom 1 = Tanggal, Kolom 2 = Judul (sesuaikan jika perlu)
+            // Jika tidak ada kolom tanggal/judul spesifik, ambil kolom 0 dan 1
+            
+            let count = 0;
+            for (let i = 1; i < rows.length && count < 7; i++) {
+                const row = rows[i];
+                if (row.length < 2) continue;
+                
+                // Coba deteksi kolom tanggal (biasanya kolom pertama atau kedua)
+                const dateVal = row[0] || '-';
+                const titleVal = row[1] || 'Data';
+
+                list.innerHTML += `
+                    <li class="data-item">
+                        <span class="data-date">${dateVal}</span>
+                        <div class="data-title">${titleVal}</div>
+                    </li>
+                `;
+                count++;
+            }
+        }
+
+        let pbjChartInstance = null;
+
+        function processAndRenderStats(rows) {
+            if (!rows || rows.length === 0) return;
+
+            const headers = rows[0];
+            const headerLower = headers.map(h => h.toLowerCase());
+
+            // Deteksi Kolom PIC / Pelaksana secara otomatis berdasarkan Header
+            let nameColIndex = -1;
+            const keywords = ['pic', 'pelaksana', 'penyedia', 'vendor', 'nama', 'pihak', 'rekanan', 'kegiatan'];
+            
+            for (let key of keywords) {
+                const idx = headerLower.findIndex(h => h.includes(key));
+                if (idx !== -1) { nameColIndex = idx; break; }
+            }
+            
+            // Fallback: Jika tidak ketemu, gunakan kolom ke-3 (index 2) atau terakhir
+            if (nameColIndex === -1) nameColIndex = rows[0].length > 2 ? 2 : 1;
+
+            const counts = {};
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.length <= nameColIndex) continue;
+                const name = row[nameColIndex] ? row[nameColIndex].trim() : 'Lainnya';
+                if (name === '' || name === '-') continue;
+                counts[name] = (counts[name] || 0) + 1;
+            }
+
+            const sortedStats = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            renderChart('doughnut', sortedStats.map(s => s[0]), sortedStats.map(s => s[1]), 'Statistik Data');
+            renderGroupingList(sortedStats.map(s => s[0]), sortedStats.map(s => s[1]), false);
+        }
+
+        function renderChart(type, labels, data, labelTitle) {
+            const ctx = document.getElementById('pbjChart').getContext('2d');
+            if (pbjChartInstance) pbjChartInstance.destroy();
+
+            const colors = ['#00eaff', '#0096ff', '#d989ff', '#ff4df8', '#ffffff'];
+
+            pbjChartInstance = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelTitle,
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#334155', boxWidth: 10, font: { size: 10 } } },
+                        title: { display: true, text: 'Statistik Data', color: '#1e293b' }
+                    }
+                }
+            });
+        }
+
+        function renderGroupingList(labels, data, isCurrency) {
+            const listContainer = document.getElementById('groupingList');
+            listContainer.innerHTML = '';
+            
+            labels.forEach((label, index) => {
+                let value = data[index];
+                if (isCurrency) {
+                    value = 'Rp ' + value.toLocaleString('id-ID');
+                }
+                listContainer.innerHTML += `
+                    <div class="grouping-item">
+                        <span class="grouping-name">${label}</span>
+                        <span class="grouping-count">${value}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function loadSidebarDataFromStorage(section) {
+            // Fallback: Load manual data dari Admin jika fetch gagal
+            const list = document.getElementById('latestDataList');
+            list.innerHTML = '';
+            const rawData = localStorage.getItem(section + '_Sidebar_Data');
+            if (rawData) {
+                const lines = rawData.split('\n');
+                lines.forEach(line => {
+                    const parts = line.split('|');
+                    if (parts.length >= 2) {
+                        list.innerHTML += `<li class="data-item"><span class="data-date">${parts[0].trim()}</span><div class="data-title">${parts[1].trim()}</div></li>`;
+                    }
+                });
+            } else {
+                list.innerHTML = '<li class="data-item"><div class="data-title">Gagal memuat tabel otomatis.</div></li>';
+            }
+        }
+
+        function filterTable(query) {
+            const table = document.getElementById('pbjTable');
+            if (!table) return;
+            
+            const trs = table.getElementsByTagName('tr');
+            const filter = query.toLowerCase();
+            
+            // Kumpulkan data baris yang terlihat untuk update chart
+            let visibleRows = [];
+            
+            // Ambil Header
+            const headers = [];
+            const ths = trs[0].getElementsByTagName('th');
+            for (let th of ths) headers.push(th.innerText);
+            visibleRows.push(headers);
+
+            // Mulai dari 1 untuk skip header
+            for (let i = 1; i < trs.length; i++) {
+                const tr = trs[i];
+                const tds = tr.getElementsByTagName('td');
+                let rowText = "";
+                let rowData = [];
+                
+                for (let td of tds) {
+                    rowText += td.textContent + " ";
+                    rowData.push(td.textContent);
+                }
+
+                // Cek apakah baris mengandung text query
+                if (rowText.toLowerCase().includes(filter)) {
+                    tr.style.display = '';
+                    visibleRows.push(rowData);
+                } else {
+                    tr.style.display = 'none';
+                }
+            }
+            
+            // Update Chart dengan data yang terlihat
+            processAndRenderStats(visibleRows);
+            renderSubsatkerTable(visibleRows);
+        }
+
+        function updateChartByRow(no) {
+            // Jika input kosong, kembalikan ke mode statistik umum (berdasarkan filter tabel saat ini)
+            if (!no) {
+                const searchVal = document.querySelector('.sidebar-search input').value;
+                filterTable(searchVal);
+                return;
+            }
+
+            if (!window.smartTableData || window.smartTableData.length === 0) return;
+
+            // Cari baris berdasarkan Kolom No (Index 0)
+            // Asumsi baris pertama adalah header, jadi cari mulai index 1
+            const header = window.smartTableData[0];
+            const row = window.smartTableData.find((r, i) => i > 0 && r[0].trim() == no.trim());
+
+            if (row) {
+                renderRowChart(header, row);
+                renderRowDetails(header, row);
+            }
+        }
+
+        function renderRowChart(headers, row) {
+            const labels = [];
+            const data = [];
+            
+            // Loop kolom untuk mencari data angka (Keuangan)
+            row.forEach((cell, index) => {
+                if (index === 0) return; // Skip kolom No
+                
+                // Bersihkan format uang (Rp, titik ribuan, koma desimal)
+                // Contoh: "Rp 1.500.000,00" -> 1500000.00
+                let clean = cell.replace(/Rp\.?\s?/g, '').replace(/\./g, '').replace(',', '.');
+                let val = parseFloat(clean);
+                
+                // Cek apakah header mengandung kata kunci keuangan
+                const h = headers[index].toLowerCase();
+                const isMoneyCol = h.includes('pagu') || h.includes('hps') || h.includes('nilai') || h.includes('kontrak') || h.includes('biaya') || h.includes('anggaran');
+
+                if (!isNaN(val) && val > 0 && isMoneyCol) {
+                     labels.push(headers[index]);
+                     data.push(val);
+                }
+            });
+
+            const canvasId = 'pbjChart'; // Gunakan chart keuangan untuk detail baris
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if (pbjChartInstance) pbjChartInstance.destroy();
+
+            // Render Bar Chart untuk Perbandingan Anggaran
+            pbjChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length ? labels : ['Data Tidak Tersedia'],
+                    datasets: [{
+                        label: 'Nominal (Rp)',
+                        data: data.length ? data : [0],
+                        backgroundColor: ['#00eaff', '#0096ff', '#d989ff'],
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#334155' }, grid: { color: 'rgba(0,0,0,0.1)' } },
+                        x: { ticks: { color: '#334155', font: { size: 10 } }, grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Detail Data No. ' + row[0], color: '#1e293b' }
+                    }
+                }
+            });
+        }
+
+        function renderRowDetails(headers, row) {
+            const listContainer = document.getElementById('groupingList');
+            const subsatkerContainer = document.getElementById('subsatkerContainer');
+            
+            // Clear previous content
+            listContainer.innerHTML = '<h3 style="margin-bottom:10px; margin-top:20px; font-size: 1rem;"><i class="fas fa-list"></i> Detail Lengkap</h3>';
+            if(subsatkerContainer) subsatkerContainer.innerHTML = ''; 
+
+            headers.forEach((header, index) => {
+                let value = row[index] || '-';
+                listContainer.innerHTML += `
+                    <div class="grouping-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+                        <span class="grouping-name" style="font-size:0.75rem;">${header}</span>
+                        <span class="grouping-count" style="background: transparent; padding: 0; font-size: 0.9rem; font-weight: 500; white-space: normal; color: inherit;">${value}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function renderSubsatkerTable(rows) {
+            const container = document.getElementById('subsatkerContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!rows || rows.length === 0) return;
+
+            const headers = rows[0].map(h => h.toLowerCase());
+            // Cari kolom SUBSATKER
+            let colIndex = headers.findIndex(h => h.includes('subsatker') || h.includes('sub satker') || h.includes('satker'));
+
+            if (colIndex === -1) return; // Tidak ada kolom subsatker
+
+            const counts = {};
+            // Skip header
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.length <= colIndex) continue;
+                
+                let val = row[colIndex] ? row[colIndex].trim().toUpperCase() : '-';
+                if (val === '' || val === '-') continue;
+                
+                counts[val] = (counts[val] || 0) + 1;
+            }
+
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+            let html = '<hr style="border: 0; border-top: 1px solid rgba(226, 232, 240, 0.8); margin: 20px 0;">';
+            html += '<h3 style="margin-bottom:15px;"><i class="fas fa-building"></i> Rekap Subsatker</h3>';
+            
+            // Tombol Reset Filter
+            html += `<div class="grouping-item" onclick="resetSubsatkerFilter()" style="cursor: pointer; background: rgba(255, 255, 255, 0.5); margin-bottom: 10px; justify-content: center; border-radius: 8px;">
+                        <span class="grouping-name" style="color: #0ea5e9; font-weight: 600;"><i class="fas fa-sync-alt"></i> Tampilkan Semua Data</span>
+                     </div>`;
+
+            html += '<div style="max-height: 300px; overflow-y: auto;">';
+            
+            sorted.forEach(([name, count]) => {
+                const safeName = name.replace(/'/g, "\\'");
+                html += `
+                    <div class="grouping-item" onclick="filterBySubsatker('${safeName}')" style="cursor: pointer;">
+                        <span class="grouping-name" style="font-size:0.85rem;">${name}</span>
+                        <span class="grouping-count">${count}</span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function filterBySubsatker(name) {
+            const searchInput = document.querySelector('.sidebar-search input[placeholder="Cari di tabel..."]');
+            if (searchInput) {
+                searchInput.value = name;
+                filterTable(name);
+            }
+        }
+
+        function resetSubsatkerFilter() {
+            const searchInput = document.querySelector('.sidebar-search input[placeholder="Cari di tabel..."]');
+            if (searchInput) {
+                searchInput.value = '';
+                filterTable('');
+            }
+        }
+
+        function getHeaderRowCount(rows) {
+            if (!rows || rows.length < 1) return 0;
+            
+            // 1. Cari baris dengan pola (1), (2) -> Indikator kuat baris terakhir header
+            for (let i = 0; i < Math.min(rows.length, 10); i++) {
+                const rowStr = rows[i].join(' ');
+                if (/\(\s*1\s*\)/.test(rowStr) && /\(\s*2\s*\)/.test(rowStr)) return i + 1;
+            }
+            
+            // 2. Cari baris dengan pola RPD/REALISASI -> Indikator header
+            for (let i = 0; i < Math.min(rows.length, 10); i++) {
+                const rowStr = rows[i].join(' ').toUpperCase();
+                if ((rowStr.includes('RPD') && rowStr.includes('REALISASI')) || rowStr.includes('SISA')) return i + 1;
+            }
+            
+            return 1;
+        }
+
+        function generateTableHeaders(headerRows) {
+            if (!headerRows || headerRows.length === 0) return '';
+            
+            const rowCount = headerRows.length;
+            const colCount = headerRows[0].length;
+            const processed = Array(rowCount).fill().map(() => Array(colCount).fill(false));
+            let html = '';
+
+            for (let r = 0; r < rowCount; r++) {
+                html += '<tr>';
+                for (let c = 0; c < colCount; c++) {
+                    if (processed[r][c]) continue;
+
+                    const cellText = headerRows[r][c] || '';
+                    let colspan = 1;
+                    let rowspan = 1;
+
+                    if (cellText !== '') {
+                        // Check right for colspan
+                        for (let k = c + 1; k < colCount; k++) {
+                            const nextCell = headerRows[r][k] || '';
+                            // Merge if empty OR same text (fix for repeated headers in CSV)
+                            if ((nextCell === '' || nextCell === cellText) && !processed[r][k]) {
+                                colspan++;
+                            } else {
+                                break;
+                            }
+                        }
+                        
+                        // Check down for rowspan
+                        let canRowspan = true;
+                        for (let k = r + 1; k < rowCount; k++) {
+                            for (let l = c; l < c + colspan; l++) {
+                                const belowCell = headerRows[k][l] || '';
+                                // Merge if empty OR same text
+                                if (belowCell !== '' && belowCell !== cellText) { canRowspan = false; break; }
+                            }
+                            if (canRowspan) rowspan++;
+                            else break;
+                        }
+                    }
+
+                    // Mark processed
+                    for (let i = r; i < r + rowspan; i++) {
+                        for (let j = c; j < c + colspan; j++) {
+                            processed[i][j] = true;
+                        }
+                    }
+
+                    // Tambahkan ikon sort/logo kecil agar terlihat seperti aplikasi spreadsheet asli
+                    let iconHtml = '';
+                    if (r + rowspan === rowCount && cellText.trim() !== '') {
+                        iconHtml = ' <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5; margin-left: 5px; cursor: pointer;"></i>';
+                    }
+
+                    html += `<th colspan="${colspan}" rowspan="${rowspan}" style="padding: 12px 15px; text-align: center; background: #fef9c3; color: #854d0e; font-weight: 600; border: 1px solid #ca8a04; white-space: normal; vertical-align: middle;">${cellText}${iconHtml}</th>`;
+                }
+                html += '</tr>';
+            }
+            return html;
+        }
+
+        // --- LOGIKA LRA (Split View - Sama seperti RPD) ---
+        let lraChartInstances = {};
+
+        async function loadLRAView(url) {
+            const container = document.getElementById('iframeContainer');
+            const loader = document.getElementById('loadingLine');
+            
+            if (!url || url === 'null' || url === 'undefined') {
+                showEmptyState('LRA');
+                return;
+            }
+
+            let cleanUrl = url;
+            if (cleanUrl.includes('docs.google.com/spreadsheets')) {
+                cleanUrl = cleanUrl.replace(/\/edit.*$/, '/preview');
+            }
+
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; height: 100%;">
+                    <div class="rpd-sub-nav">
+                        <button onclick="switchLRASubTab('iframe')" id="btnLraIframe" class="rpd-sub-btn active">
+                            <i class="fas fa-file-excel"></i> Tampilan Spreadsheet
+                        </button>
+                        <button onclick="switchLRASubTab('table')" id="btnLraTable" class="rpd-sub-btn">
+                            <i class="fas fa-chart-pie"></i> Kesimpulan
+                        </button>
+                    </div>
+                    
+                    <div style="flex: 1; position: relative; overflow: hidden;">
+                        <div id="lraIframeView" style="width:100%; height:100%; display:block;">
+                            <iframe src="${cleanUrl}" style="width:100%; height:100%; border:none;"></iframe>
+                        </div>
+                        
+                        <div id="lraTableView" style="width:100%; height:100%; display:none; background:#f8fafc; flex-direction:column; overflow-y: auto;">
+                            <div style="padding: 15px 20px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; z-index: 20; position: sticky; top: 0;">
+                                <div class="sidebar-search" style="margin:0; width: 100%; max-width: 600px;">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" placeholder="Filter kesimpulan (contoh: 'Belanja', 'Januari')..." onkeyup="filterLRATable(this.value)">
+                                </div>
+                            </div>
+                            <div id="lraSummary" style="padding: 20px; display: block; flex-shrink: 0; border-bottom: 1px solid #cbd5e1;">
+                                <!-- Summary injected here -->
+                            </div>
+                            <div style="display:none; background: white; position: relative; height: 800px; flex-shrink: 0;" id="lraTableContent">
+                                <div class="empty-state" style="height: 100%;"><i class="fas fa-spinner fa-spin"></i><p>Memuat data tabel...</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => { loader.style.width = '100%'; }, 300);
+            setTimeout(() => { loader.style.opacity = '0'; }, 800);
+
+            const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (match) {
+                const sheetId = match[1];
+                const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+                try {
+                    const response = await fetch(csvUrl);
+                    const csvText = await response.text();
+                    const rows = parseCSV(csvText);
+                    window.lraRawRows = rows;
+                    const headerCount = getHeaderRowCount(rows);
+                    
+                    updateLRADashboard(rows, headerCount);
+
+                    const tableContainer = document.getElementById('lraTableContent');
+                    let maxCols = 0;
+                    rows.forEach(r => { if(r.length > maxCols) maxCols = r.length; });
+
+                    const headerRows = rows.slice(0, headerCount);
+                    const bodyRows = rows.slice(headerCount);
+
+                    const normHeaders = headerRows.map(r => {
+                        const nr = [...r];
+                        while(nr.length < maxCols) nr.push('');
+                        return nr;
+                    });
+
+                    let html = '<div style="padding: 10px 20px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #475569; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;"><span><i class="fas fa-table"></i> Data Tabel Rinci</span> <span style="font-size: 0.8rem; font-weight: normal; color: #94a3b8;">(Scroll untuk melihat)</span></div>';
+                    html += '<div class="native-table-wrapper" style="height: calc(100% - 45px); overflow: auto;"><table class="native-table" id="lraTable" style="width: max-content; min-width: 100%;">';
+                    html += '<thead>' + generateTableHeaders(normHeaders) + '</thead><tbody>';
+                    
+                    bodyRows.forEach(row => {
+                        if (row.length === 1 && (!row[0] || row[0].trim() === '')) return;
+                        html += '<tr>';
+                        for(let j=0; j<maxCols; j++) { html += `<td>${row[j] || ''}</td>`; }
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                    
+                    tableContainer.innerHTML = html;
+                    tableContainer.style.display = 'block';
+                } catch (e) {
+                    console.error(e);
+                    const tableContainer = document.getElementById('lraTableContent');
+                    if(tableContainer) {
+                        tableContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#64748b;">Gagal memuat data tabel.</div>';
+                        tableContainer.style.display = 'block';
+                    }
+                    document.getElementById('lraSummary').style.display = 'none';
+                }
+            }
+        }
+
+        function switchLRASubTab(mode) {
+            const btnIframe = document.getElementById('btnLraIframe');
+            const btnTable = document.getElementById('btnLraTable');
+            const viewIframe = document.getElementById('lraIframeView');
+            const viewTable = document.getElementById('lraTableView');
+
+            if (mode === 'iframe') {
+                btnIframe.classList.add('active');
+                btnTable.classList.remove('active');
+                viewIframe.style.display = 'block';
+                viewTable.style.display = 'none';
+            } else {
+                btnIframe.classList.remove('active');
+                btnTable.classList.add('active');
+                viewIframe.style.display = 'none';
+                viewTable.style.display = 'flex';
+            }
+        }
+
+        function filterLRATable(query) {
+            const table = document.getElementById('lraTable');
+            if (!table) return;
+            
+            const filter = query.toLowerCase();
+            const trs = table.querySelectorAll('tbody tr');
+            let visibleData = [];
+            
+            trs.forEach(tr => {
+                const text = tr.textContent.toLowerCase();
+                if (text.includes(filter)) {
+                    tr.style.display = '';
+                    const rowData = Array.from(tr.children).map(td => td.innerText);
+                    visibleData.push(rowData);
+                } else {
+                    tr.style.display = 'none';
+                }
+            });
+
+            if (window.lraRawRows) {
+                const headerCount = getHeaderRowCount(window.lraRawRows);
+                const headers = window.lraRawRows.slice(0, headerCount);
+                const fullData = [...headers, ...visibleData];
+                updateLRADashboard(fullData, headerCount);
+            }
+        }
+
+        function updateLRADashboard(rows, headerCount = 1) {
+            const container = document.getElementById('lraSummary');
+            if (!container) return;
+
+            if (!rows || rows.length <= headerCount) {
+                container.innerHTML = '<div style="color:#64748b; font-size:1rem; width:100%; text-align:center; margin-top: 40px;">Tidak ada data untuk ditampilkan.</div>';
+                return;
+            }
+
+            const headers = rows[0];
+            const rowCount = rows.length - headerCount;
+
+            let categoryIdx = -1;
+            let valueIdx = -1;
+            const numericIndices = [];
+            const excludeKeywords = ['no', 'nomor', 'urut', 'tahun', 'kode', 'id', 'nik', 'nip', 'bulan', 'semester', 'tanggal', 'update', 'aksi', 'ket', 'keterangan'];
+
+            headers.forEach((header, idx) => {
+                const h = header.toLowerCase();
+                let numericCount = 0;
+                let dataCount = 0;
+                const sampleLimit = Math.min(rows.length, 50 + headerCount);
+                for (let i = headerCount; i < sampleLimit; i++) {
+                    if (rows[i] && rows[i][idx]) {
+                        let cell = rows[i][idx].trim();
+                        if (cell === '' || cell === '-') continue;
+                        dataCount++;
+                        let clean = cell.replace(/Rp\.?\s?/gi, '').replace(/\./g, '').replace(',', '.');
+                        if (!isNaN(parseFloat(clean)) && isFinite(clean)) {
+                            numericCount++;
+                        }
+                    }
+                }
+                const isNumeric = dataCount > 0 && (numericCount / dataCount) > 0.7;
+                if (isNumeric && !excludeKeywords.some(k => h === k || h.startsWith(k + ' ') || h.endsWith(' ' + k))) {
+                    numericIndices.push(idx);
+                    if (valueIdx === -1) valueIdx = idx;
+                } else if (!isNumeric && categoryIdx === -1 && dataCount > 0 && !excludeKeywords.some(k => h.includes(k))) {
+                    categoryIdx = idx;
+                }
+            });
+
+            const moneyKeywords = ['jumlah', 'total', 'pagu', 'nilai', 'biaya', 'anggaran', 'harga', 'realisasi'];
+            const bestValueIdx = numericIndices.find(idx => moneyKeywords.some(k => headers[idx].toLowerCase().includes(k)));
+            if (bestValueIdx !== undefined) valueIdx = bestValueIdx;
+
+            const summaryRows = [];
+            const summaryKeywords = ['JUMLAH', 'TOTAL', 'REKAP', 'GRAND TOTAL'];
+
+            for (let i = headerCount; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.length === 0) continue;
+                let foundLabel = null;
+                for(let c = 0; c < Math.min(row.length, 4); c++) {
+                    const cellText = (row[c] || '').toString().toUpperCase();
+                    if (summaryKeywords.some(k => cellText.includes(k))) {
+                        foundLabel = (row[c] || '').toString().trim();
+                        break;
+                    }
+                }
+                if (foundLabel) {
+                    let val = 0;
+                    if (valueIdx !== -1 && row[valueIdx]) {
+                        let clean = row[valueIdx].replace(/Rp\.?\s?/gi, '').replace(/\./g, '').replace(',', '.').trim();
+                        val = parseFloat(clean) || 0;
+                    }
+                    if (val === 0) {
+                         for (let idx of numericIndices) {
+                            if (row[idx]) {
+                                let clean = row[idx].replace(/Rp\.?\s?/gi, '').replace(/\./g, '').replace(',', '.').trim();
+                                let v = parseFloat(clean);
+                                if (!isNaN(v) && v > 0) { val = v; break; }
+                            }
+                        }
+                    }
+                    if (val > 0) {
+                        summaryRows.push({ label: foundLabel, value: val });
+                    }
+                }
+            }
+
+            let html = '';
+            const fmt = (n) => 'Rp ' + n.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+            if (summaryRows.length > 0) {
+                html += '<div class="rpd-dashboard-grid">';
+                summaryRows.forEach(item => {
+                    const safeLabel = item.label.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    html += `
+                        <div class="rpd-card" onclick="openLRADetail('${safeLabel}')" style="border-left: 5px solid #eab308; background: #fefce8; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                            <div class="rpd-card-title" style="color: #854d0e;">${item.label}</div>
+                            <div class="rpd-card-value" style="color: #ca8a04;">${fmt(item.value)}</div>
+                            <div class="rpd-card-sub" style="color: #a16207; font-size: 0.75rem; margin-top: 8px;"><i class="fas fa-search-plus"></i> Klik untuk rincian</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                html += `
+                    <div class="rpd-charts-container">
+                        <div class="rpd-chart-card">
+                            <div class="rpd-chart-header"><i class="fas fa-chart-pie" style="color:#eab308;"></i> Perbandingan Total</div>
+                            <div style="position: relative; height: 280px; width: 100%;">
+                                <canvas id="lraSummaryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                html += `<div id="lraDetailSection" style="display:none; margin-top: 30px; animation: fadeIn 0.5s;"></div>`;
+                container.innerHTML = html;
+                renderLRASummaryChart(summaryRows);
+                return;
+            }
+
+            const globalTotals = {};
+            const globalMax = {};
+            numericIndices.forEach(idx => { globalTotals[idx] = 0; globalMax[idx] = 0; });
+            const categoryTotals = {};
+
+            for (let i = headerCount; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row) continue;
+                if (row.length === 1 && row[0] === '') continue;
+                const firstCol = row[0] ? row[0].toString().trim().toLowerCase() : '';
+                const secondCol = row[1] ? row[1].toString().trim().toLowerCase() : '';
+                if (/^(total|jumlah|rekap|grand total)/.test(firstCol) || /^(total|jumlah)/.test(secondCol)) continue;
+                
+                row.forEach((cell, idx) => {
+                    if (numericIndices.includes(idx) && cell) {
+                        let clean = cell.replace(/Rp\.?\s?/gi, '').replace(/\./g, '').replace(',', '.').trim();
+                        let val = parseFloat(clean);
+                        if (!isNaN(val)) {
+                            globalTotals[idx] += val;
+                            if (val > globalMax[idx]) globalMax[idx] = val;
+                        }
+                    }
+                });
+
+                if (categoryIdx !== -1 && valueIdx !== -1) {
+                    let catName = row[categoryIdx] ? row[categoryIdx].trim() : 'Lainnya';
+                    if (!catName || catName === '-') catName = 'Tanpa Kategori';
+                    if (row[valueIdx]) {
+                        let cleanVal = row[valueIdx].replace(/Rp\.?\s?/gi, '').replace(/\./g, '').replace(',', '.').trim();
+                        let val = parseFloat(cleanVal);
+                        if (!isNaN(val)) {
+                            categoryTotals[catName] = (categoryTotals[catName] || 0) + val;
+                        }
+                    }
+                }
+            }
+
+            html += '<div class="rpd-dashboard-grid">';
+            html += `
+                <div class="rpd-card">
+                    <div class="rpd-card-title">TOTAL ITEM DATA</div>
+                    <div class="rpd-card-value" style="color: #1e293b;">${rowCount}</div>
+                    <div class="rpd-card-sub">Baris Data</div>
+                </div>
+            `;
+            numericIndices.forEach(idx => {
+                let label = headers[idx];
+                if (label.toUpperCase().startsWith('JUMLAH')) label = label.substring(6).trim();
+                else if (label.toUpperCase().startsWith('TOTAL')) label = label.substring(5).trim();
+                if (!label) label = "NOMINAL";
+                const total = globalTotals[idx];
+                const max = globalMax[idx];
+                html += `
+                    <div class="rpd-card">
+                        <div class="rpd-card-title">TOTAL ${label.toUpperCase()}</div>
+                        <div class="rpd-card-value" style="color: #ca8a04;">${fmt(total)}</div>
+                        <div class="rpd-card-sub">Tertinggi: ${fmt(max)}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            if (categoryIdx !== -1 && valueIdx !== -1) {
+                html += `
+                    <div class="rpd-charts-container">
+                        <div class="rpd-chart-card">
+                            <div class="rpd-chart-header"><i class="fas fa-chart-bar" style="color:#eab308;"></i> Peringkat Teratas</div>
+                            <div style="position: relative; height: 280px; width: 100%;">
+                                <canvas id="lraBarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="rpd-chart-card">
+                            <div class="rpd-chart-header"><i class="fas fa-chart-pie" style="color:#eab308;"></i> Proporsi Kategori</div>
+                            <div style="position: relative; height: 280px; width: 100%;">
+                                <canvas id="lraDoughnutChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // --- Bagian Bawah: Rincian per Kategori (Jika ada) ---
+            if (categoryIdx !== -1 && valueIdx !== -1) {
+                const sortedCats = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+                const catHeader = headers[categoryIdx];
+                const valHeader = headers[valueIdx];
+
+                html += `<h3 style="width: 100%; font-size: 1.1rem; color: #1e293b; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-list-ul" style="color: #eab308;"></i> Rincian Total ${valHeader} per ${catHeader}
+                         </h3>`;
+                
+                html += '<div style="width: 100%; background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">';
+                
+                sortedCats.forEach(([cat, val], index) => {
+                    const bg = index % 2 === 0 ? '#fff' : '#f8fafc';
+                    html += `<div style="padding: 15px 20px; background: ${bg}; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9;"><div style="display:flex; align-items:center; gap:10px; overflow:hidden;"><span style="background:#fef9c3; color:#854d0e; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:6px; min-width:24px; text-align:center;">${index + 1}</span><div style="font-weight: 600; color: #334155; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${cat}">${cat}</div></div><div style="font-weight: 700; color: #ca8a04; font-size: 0.95rem;">${fmt(val)}</div></div>`;
+                });
+                
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+            if (categoryIdx !== -1 && valueIdx !== -1) {
+                renderLRAChartsData(categoryTotals, headers[valueIdx]);
+            }
+        }
+
+        function renderLRASummaryChart(data) {
+            const ctx = document.getElementById('lraSummaryChart');
+            if (!ctx) return;
+            if (lraChartInstances.summary) lraChartInstances.summary.destroy();
+            lraChartInstances.summary = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.label),
+                    datasets: [{
+                        data: data.map(d => d.value),
+                        backgroundColor: ['#eab308', '#f59e0b', '#d97706', '#b45309', '#78350f', '#fbbf24', '#fcd34d'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, layout: { padding: 10 },
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true, padding: 15, font: { size: 11 } } },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)', titleColor: '#1e293b', bodyColor: '#1e293b', borderColor: '#e2e8f0', borderWidth: 1, padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || ''; if (label) label += ': ';
+                                    let value = context.raw; let total = context.chart._metasets[context.datasetIndex].total;
+                                    let percentage = Math.round((value / total) * 100) + '%';
+                                    return label + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value) + ' (' + percentage + ')';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%', animation: { animateScale: true, animateRotate: true }
+                }
+            });
+        }
+
+        function openLRADetail(label) {
+            const rows = window.lraRawRows;
+            if(!rows) return;
+            const headerCount = getHeaderRowCount(rows);
+            let targetIndex = -1;
+            let prevSummaryIndex = 0;
+            const summaryKeywords = ['JUMLAH', 'TOTAL', 'REKAP', 'GRAND TOTAL'];
+            for(let i = headerCount; i < rows.length; i++) {
+                const row = rows[i];
+                let isSum = false;
+                let foundLabel = null;
+                for(let c = 0; c < Math.min(row.length, 4); c++) {
+                    const txt = (row[c]||'').toString().toUpperCase();
+                    if(summaryKeywords.some(k => txt.includes(k))) {
+                        isSum = true; foundLabel = (row[c]||'').toString().trim(); break;
+                    }
+                }
+                if(isSum) {
+                    if(foundLabel === label) { targetIndex = i; break; }
+                    prevSummaryIndex = i;
+                }
+            }
+            if(targetIndex === -1) return;
+            const startIndex = prevSummaryIndex === 0 ? headerCount : prevSummaryIndex + 1;
+            const detailRows = rows.slice(startIndex, targetIndex);
+            const headerRows = rows.slice(0, headerCount);
+            let maxCols = 0;
+            headerRows.forEach(r => { if(r.length > maxCols) maxCols = r.length; });
+            detailRows.forEach(r => { if(r.length > maxCols) maxCols = r.length; });
+            const normalizedHeaders = headerRows.map(r => {
+                const nr = [...r]; while(nr.length < maxCols) nr.push(''); return nr;
+            });
+            // Reuse renderDetailView but target LRA container
+            renderDetailView(label, normalizedHeaders, detailRows, 'lraDetailSection');
+        }
+
+        function renderLRAChartsData(categoryTotals, valueLabel) {
+            const sorted = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+            const top10 = sorted.slice(0, 10);
+            const top5 = sorted.slice(0, 5);
+            const barLabels = top10.map(i => i[0].length > 20 ? i[0].substring(0, 20) + '...' : i[0]);
+            const barData = top10.map(i => i[1]);
+            const doughnutLabels = top5.map(i => i[0]);
+            const doughnutData = top5.map(i => i[1]);
+            const otherTotal = sorted.slice(5).reduce((acc, curr) => acc + curr[1], 0);
+            if (otherTotal > 0) { doughnutLabels.push('Lainnya'); doughnutData.push(otherTotal); }
+
+            if (lraChartInstances.bar) lraChartInstances.bar.destroy();
+            if (lraChartInstances.doughnut) lraChartInstances.doughnut.destroy();
+
+            const ctxBar = document.getElementById('lraBarChart');
+            if (ctxBar) {
+                const ctx = ctxBar.getContext('2d');
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, '#facc15'); gradient.addColorStop(1, '#ca8a04');
+                lraChartInstances.bar = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: barLabels,
+                        datasets: [{
+                            label: valueLabel, data: barData, backgroundColor: gradient, borderRadius: 8, barPercentage: 0.6, categoryPercentage: 0.8
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(255, 255, 255, 0.95)', titleColor: '#1e293b', bodyColor: '#1e293b', borderColor: '#e2e8f0', borderWidth: 1, callbacks: { label: (c) => ' ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(c.raw) } } },
+                        scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' }, ticks: { font: { size: 10 }, color: '#64748b' }, title: { display: true, text: 'Nominal (Rp)' } }, x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#64748b' } } }
+                    }
+                });
+            }
+
+            const ctxDoughnut = document.getElementById('lraDoughnutChart');
+            if (ctxDoughnut) {
+                lraChartInstances.doughnut = new Chart(ctxDoughnut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: doughnutLabels,
+                        datasets: [{
+                            data: doughnutData, backgroundColor: ['#eab308', '#f59e0b', '#d97706', '#b45309', '#78350f', '#fbbf24', '#cbd5e1'], borderWidth: 2, borderColor: '#ffffff', hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false, layout: { padding: 10 },
+                        plugins: {
+                            legend: { position: 'right', labels: { boxWidth: 12, usePointStyle: true, padding: 15, font: { size: 11 } } },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)', bodyColor: '#1e293b', borderColor: '#e2e8f0', borderWidth: 1,
+                                callbacks: {
+                                    label: function(context) {
+                                        let value = context.raw; let total = context.chart._metasets[context.datasetIndex].total;
+                                        let percentage = Math.round((value / total) * 100) + '%';
+                                        return ' ' + new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value) + ' (' + percentage + ')';
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '70%', animation: { animateScale: true, animateRotate: true }
+                    }
+                });
+            }
+        }
+
+        // --- FITUR NOTIFIKASI KONTRAK (PBJ) ---
+        async function runBackgroundNotificationCheck() {
+            const pbjUrl = localStorage.getItem('PBJ_Url');
+            if (!pbjUrl || pbjUrl === 'null' || pbjUrl === 'undefined') return;
+            
+            const match = pbjUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (!match) return;
+            
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv`;
+            try {
+                const res = await fetch(csvUrl);
+                const text = await res.text();
+                const rows = parseCSV(text);
+                checkContractDeadlines(rows);
+            } catch (e) { console.error("Background check failed", e); }
+        }
+
+        function checkContractDeadlines(rows) {
+            const expiringContracts = getExpiringContracts(rows);
+
+            if (expiringContracts.length > 0) {
+                showContractNotification(expiringContracts);
+                updateNotifButton(expiringContracts);
+                sendBrowserNotification(expiringContracts);
+            }
+        }
+
+        function getExpiringContracts(rows) {
+            if (!rows || rows.length < 2) return [];
+
+            // Cari baris header yang mengandung kata kunci tanggal kontrak (Scan 5 baris pertama)
+            let headerRowIdx = -1;
+            let dateColIdx = -1;
+            
+            for(let i = 0; i < Math.min(rows.length, 5); i++) {
+                const rowUpper = rows[i].map(h => (h||'').toString().toUpperCase());
+                const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU'));
+                if(idx !== -1) {
+                    headerRowIdx = i;
+                    dateColIdx = idx;
+                    break;
+                }
+            }
+
+            if (headerRowIdx === -1 || dateColIdx === -1) return [];
+            
+            const headers = rows[headerRowIdx].map(h => (h||'').toString().toUpperCase());
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Cek sampai 7 hari ke depan
+            const maxDate = new Date(today);
+            maxDate.setDate(today.getDate() + 7);
+
+            const expiringContracts = [];
+
+            for (let i = headerRowIdx + 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row[dateColIdx]) continue;
+
+                const dateStr = row[dateColIdx].trim();
+                let contractDate = parseIndonesianDate(dateStr);
+
+                if (contractDate) {
+                    contractDate.setHours(0, 0, 0, 0);
+                    
+                    // Cek jika tanggal kontrak >= hari ini DAN <= 7 hari ke depan
+                    if (contractDate >= today && contractDate <= maxDate) {
+                        // Cari nama pekerjaan
+                        let nameIdx = headers.findIndex(h => h.includes('NAMA') || h.includes('PEKERJAAN') || h.includes('KEGIATAN') || h.includes('PAKET') || h.includes('URAIAN'));
+                        if (nameIdx === -1) nameIdx = 1; // Fallback ke kolom ke-2
+                        
+                        const contractName = row[nameIdx] || 'Kontrak Tanpa Nama';
+                        
+                        // Hitung selisih hari
+                        const diffTime = Math.abs(contractDate - today);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        const statusMsg = diffDays === 0 ? "HARI INI" : `${diffDays} hari lagi`;
+
+                        expiringContracts.push({ name: contractName, date: dateStr, status: statusMsg });
+                    }
+                }
+            }
+
+            return expiringContracts;
+        }
+
+        function parseIndonesianDate(dateStr) {
+            if (!dateStr) return null;
+            dateStr = dateStr.trim();
+            
+            // Coba format YYYY-MM-DD (ISO)
+            let isoMatch = dateStr.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+            if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
+
+            dateStr = dateStr.toLowerCase().replace(/,/g, '');
+            
+            // Format: DD/MM/YYYY
+            let parts = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
+
+            // Format: DD Bulan YYYY
+            parts = dateStr.split(' ');
+            if (parts.length >= 3) {
+                const day = parseInt(parts[0]);
+                const monthStr = parts[1];
+                const year = parseInt(parts[2]);
+                const months = { 'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11, 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'jun': 5, 'jul': 6, 'agu': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'des': 11 };
+                if (!isNaN(day) && !isNaN(year) && months[monthStr] !== undefined) return new Date(year, months[monthStr], day);
+            }
+            
+            // Fallback ke default JS Date parser
+            const d = new Date(dateStr);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        let activeContracts = [];
+        function updateNotifButton(contracts) {
+            activeContracts = contracts;
+            const btn = document.getElementById('notifBtn');
+            if(btn) {
+                btn.style.display = 'flex';
+                btn.classList.add('has-notif');
+                btn.innerHTML = `<i class="fas fa-bell"></i><span class="badge">${contracts.length}</span>`;
+            }
+        }
+
+        function toggleNotifPopup() {
+            const container = document.getElementById('contractNotifContainer');
+            if(container) container.remove(); // Reset jika sudah ada
+            if(activeContracts.length > 0) showContractNotification(activeContracts);
+        }
+
+        function showContractNotification(contracts) {
+            // Inject Styles untuk Notifikasi Mobile-like
+            if (!document.getElementById('notifStyles')) {
+                const style = document.createElement('style');
+                style.id = 'notifStyles';
+                style.innerHTML = `
+                    @keyframes notifSlideDown { from { transform: translateY(-150%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+                    @keyframes notifSlideUp { to { transform: translateY(-150%); opacity: 0; } }
+                    .notif-mobile-card {
+                        background: rgba(255, 255, 255, 0.95);
+                        backdrop-filter: blur(12px);
+                        -webkit-backdrop-filter: blur(12px);
+                        border-radius: 24px;
+                        padding: 18px;
+                        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.05);
+                        display: flex;
+                        gap: 16px;
+                        align-items: flex-start;
+                        animation: notifSlideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+                        width: 100%;
+                        pointer-events: auto;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .notif-icon {
+                        width: 48px; height: 48px;
+                        background: linear-gradient(135deg, #ef4444, #dc2626);
+                        border-radius: 16px;
+                        display: flex; align-items: center; justify-content: center;
+                        color: white; font-size: 1.4rem;
+                        box-shadow: 0 8px 16px rgba(239, 68, 68, 0.25);
+                        flex-shrink: 0;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            let notifContainer = document.getElementById('contractNotifContainer');
+            if (!notifContainer) {
+                notifContainer = document.createElement('div');
+                notifContainer.id = 'contractNotifContainer';
+                notifContainer.style.cssText = "position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 420px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none;";
+                document.body.appendChild(notifContainer);
+            } else {
+                notifContainer.innerHTML = ''; // Bersihkan notifikasi lama agar tidak menumpuk
+            }
+
+            const alertBox = document.createElement('div');
+            alertBox.className = 'notif-mobile-card';
+            
+            let listHtml = '<ul style="margin: 8px 0 0; padding: 0; list-style: none; max-height: 120px; overflow-y: auto;">';
+            contracts.forEach(c => {
+                listHtml += `
+                <li style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #475569;">
+                    <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">${c.name}</span>
+                    <span style="font-size: 0.7rem; font-weight: 700; color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 20px;">${c.status}</span>
+                </li>`;
+            });
+            listHtml += '</ul>';
+
+            alertBox.innerHTML = `
+                <div class="notif-icon">
+                    <i class="fas fa-bell fa-shake"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #0f172a;">Peringatan Kontrak</h4>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">Baru saja</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.9rem; color: #64748b; line-height: 1.4;">
+                        Terdapat <strong style="color: #ef4444;">${contracts.length} kontrak</strong> mendekati jatuh tempo.
+                    </p>
+                    ${listHtml}
+                </div>
+                <button onclick="dismissNotif(this)" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: #cbd5e1; cursor: pointer; padding: 5px;"><i class="fas fa-times"></i></button>
+            `;
+            
+            notifContainer.appendChild(alertBox);
+
+            playNotificationSound(); // Mainkan suara
+            // Auto dismiss
+            setTimeout(() => {
+                if(alertBox.parentElement) dismissNotif(alertBox.querySelector('button'));
+            }, 8000);
+        }
+
+        window.dismissNotif = function(btn) {
+            const card = btn.closest('.notif-mobile-card');
+            card.style.animation = 'notifSlideUp 0.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1)';
+            setTimeout(() => card.remove(), 500);
+        }
+
+        function playNotificationSound() {
+            // Suara 'Ting' sederhana
+            const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+            audio.play().catch(e => console.log("Audio play failed (user interaction needed first)", e));
+        }
+
+        // --- FUNGSI TEST / SIMULASI ---
+        async function testNotification() {
+            // Cek Izin Dulu
+            if (Notification.permission === "denied") {
+                alert("Izin notifikasi diblokir oleh browser!\n\nSilakan klik ikon gembok/pengaturan di samping URL bar, lalu ubah 'Notifikasi' menjadi 'Izinkan' (Allow).");
+                return;
+            }
+            
+            if (Notification.permission === "default") {
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") return;
+            }
+
+            // Coba ambil data asli dari URL yang tersimpan
+            const pbjUrl = localStorage.getItem('PBJ_Url');
+            if (pbjUrl) {
+                const match = pbjUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                if (match) {
+                    try {
+                        showToast("Memeriksa data kontrak asli...");
+                        const csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/gviz/tq?tqx=out:csv`;
+                        const res = await fetch(csvUrl);
+                        const text = await res.text();
+                        const rows = parseCSV(text);
+                        const contracts = getExpiringContracts(rows);
+
+                        if (contracts.length > 0) {
+                            showContractNotification(contracts);
+                            updateNotifButton(contracts);
+                            sendBrowserNotification(contracts);
+                            return;
+                        } else {
+                            alert("Tidak ada kontrak yang mendekati jatuh tempo pada data asli.");
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("Gagal cek data asli:", e);
+                    }
+                }
+            }
+
+            // Fallback ke simulasi jika tidak ada URL atau error
+            const dummyContracts = [{ name: "Contoh: Pengadaan Laptop (Simulasi)", status: "HARI INI" }, { name: "Contoh: Renovasi Gedung (Simulasi)", status: "3 hari lagi" }];
+            showContractNotification(dummyContracts);
+            updateNotifButton(dummyContracts);
+            sendBrowserNotification(dummyContracts);
+        }
+
+        function sendBrowserNotification(contracts) {
+            if (!("Notification" in window)) return;
+
+            const title = "Peringatan Kontrak PBJ";
+            const options = {
+                body: `Terdapat ${contracts.length} kontrak mendekati jatuh tempo. Cek dashboard untuk detail.`,
+                icon: "https://yt3.ggpht.com/a/AATXAJwDikBj_PcvGKe5caluqknHoXgqXk7I5vY1CqY9=s900-c-k-c0xffffffff-no-rj-mo",
+                requireInteraction: true // Notifikasi tetap muncul sampai diklik/ditutup
+            };
+
+            if (Notification.permission === "granted") {
+                new Notification(title, options);
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") new Notification(title, options);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
