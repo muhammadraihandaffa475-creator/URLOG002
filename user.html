@@ -294,18 +294,20 @@ iframe {
 .native-table {
     width: max-content; /* Tabel akan melebar sesuai isi konten, tidak dipaksa 100% */
     min-width: 100%;    /* Minimal selebar layar jika datanya sedikit */
-    border-collapse: collapse;
-    color: white;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #334155;
     font-size: 0.9rem;
 }
 .native-table th {
-    background: #fef9c3;
+    background: #f1f5f9;
     padding: 15px;
     text-align: left;
     font-weight: 600;
-    color: #854d0e;
-    z-index: 5;
-    border: 1px solid #ca8a04;
+    color: #1e293b;
+    z-index: 20;
+    border-bottom: 2px solid #cbd5e1;
+    border-right: 1px solid #e2e8f0;
     white-space: normal;
     vertical-align: middle;
     text-align: center;
@@ -315,12 +317,14 @@ iframe {
 }
 .native-table td {
     padding: 12px 15px;
-    border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+    border-bottom: 1px solid #f1f5f9;
+    border-right: 1px solid #f8fafc;
     color: #334155;
     white-space: nowrap;
+    background: white;
 }
-.native-table tr:hover {
-    background: rgba(241, 245, 249, 0.5);
+.native-table tr:hover td {
+    background: #f0f9ff;
 }
 
 .pbj-content-row {
@@ -594,6 +598,9 @@ iframe {
                     <button class="btn-icon" id="notifBtn" onclick="toggleNotifPopup()" style="display: none;" title="Peringatan Kontrak">
                         <i class="fas fa-bell"></i>
                     </button>
+                    <button class="btn-icon" id="btnFocusTable" onclick="toggleTableFocus()" style="display: none;" title="Mode Fokus (Hanya Tabel)">
+                        <i class="fas fa-expand"></i>
+                    </button>
                     <button class="btn-icon" onclick="testNotification()" title="Coba Simulasi Notifikasi">
                         <i class="fas fa-vial"></i>
                     </button>
@@ -806,10 +813,12 @@ iframe {
             const pbjSidebar = document.getElementById('pbjSidebar');
             const pbjStatsRow = document.getElementById('pbjStatsRow');
             const dashboardContainer = document.getElementById('dashboardContainer');
+            const btnFocus = document.getElementById('btnFocusTable');
             
             if (section === 'PBJ' || section === 'E-PERWABKU') {
                 pbjSidebar.style.display = 'flex';
                 pbjStatsRow.style.display = 'flex';
+                if(btnFocus) btnFocus.style.display = 'flex';
                 
                 // Bersihkan tampilan lama saat berpindah tab
                 if (pbjChartInstance) { pbjChartInstance.destroy(); pbjChartInstance = null; }
@@ -828,6 +837,7 @@ iframe {
             } else {
                 pbjSidebar.style.display = 'none';
                 pbjStatsRow.style.display = 'none';
+                if(btnFocus) btnFocus.style.display = 'none';
             }
 
             // Ambil URL dari LocalStorage
@@ -891,6 +901,30 @@ iframe {
         function refreshIframe() {
             const iframe = document.querySelector('iframe');
             if (iframe) iframe.src = iframe.src;
+        }
+
+        function toggleTableFocus() {
+            const stats = document.getElementById('pbjStatsRow');
+            const sidebar = document.getElementById('pbjSidebar');
+            const btn = document.getElementById('btnFocusTable');
+            const icon = btn.querySelector('i');
+            
+            // Cek apakah sidebar sedang hidden (indikator mode fokus)
+            const isFocused = sidebar.style.display === 'none';
+            
+            if (isFocused) {
+                // Keluar mode fokus (Tampilkan kembali)
+                stats.style.display = 'flex';
+                sidebar.style.display = 'flex';
+                icon.className = 'fas fa-expand';
+                btn.title = "Mode Fokus (Hanya Tabel)";
+            } else {
+                // Masuk mode fokus (Sembunyikan stats & sidebar)
+                stats.style.display = 'none';
+                sidebar.style.display = 'none';
+                icon.className = 'fas fa-compress';
+                btn.title = "Keluar Mode Fokus";
+            }
         }
 
         // --- LOGIKA RPD (Pencairan & Kesimpulan) ---
@@ -1504,17 +1538,23 @@ iframe {
         function renderNativeTable(rows) {
             const container = document.getElementById('iframeContainer');
             if (rows.length === 0) return;
+            
+            // Pastikan jumlah kolom konsisten berdasarkan header
+            const headerRow = rows[0];
+            const colCount = headerRow.length;
 
             let html = '<div class="native-table-wrapper"><table class="native-table" id="pbjTable">';
             
             // Header (Baris pertama)
             html += '<thead><tr>';
-            rows[0].forEach(cell => {
+            headerRow.forEach((cell, index) => {
                 let style = '';
                 const c = (cell||'').toString().toLowerCase().trim();
                 // Deteksi kolom No agar tidak terlalu lebar, dan kolom Nama agar cukup lebar
-                if(c === 'no' || c === 'no.' || c === 'nomor') style = 'width: 50px; min-width: 50px; text-align: center;';
-                else if(c.includes('nama') || c.includes('uraian') || c.includes('pekerjaan') || c.includes('paket')) style = 'min-width: 300px;';
+                // Sticky kolom pertama (biasanya No)
+                if(index === 0 || c === 'no' || c === 'no.' || c === 'nomor') style = 'width: 50px; min-width: 50px; text-align: center; position: sticky; left: 0; z-index: 21;';
+                else if(c.includes('nama') || c.includes('uraian') || c.includes('pekerjaan') || c.includes('paket') || c.includes('kegiatan') || c.includes('belanja')) style = 'min-width: 160px; max-width: 300px; white-space: normal; font-size: 0.85rem;';
+                else style = 'min-width: 100px; max-width: 200px; white-space: normal; font-size: 0.85rem;';
                 html += `<th style="${style}">${cell}</th>`;
             });
             html += '</tr></thead>';
@@ -1523,12 +1563,25 @@ iframe {
             html += '<tbody>';
             for (let i = 1; i < rows.length; i++) {
                 // Skip baris kosong
-                if (rows[i].length === 1 && rows[i][0] === '') continue;
+                if (rows[i].length === 1 && (!rows[i][0] || rows[i][0] === '')) continue;
                 
                 html += '<tr>';
-                rows[i].forEach(cell => {
-                    html += `<td>${cell}</td>`;
-                });
+                for (let j = 0; j < colCount; j++) {
+                    const cell = rows[i][j] || '';
+                    // Sticky kolom pertama
+                    const isSticky = (j === 0);
+                    let cellStyle = isSticky ? 'position: sticky; left: 0; z-index: 10; font-weight: 600; text-align: center; background: #fff; border-right: 2px solid #e2e8f0;' : '';
+                    
+                    // Cek header untuk wrapping text pada kolom panjang (Kegiatan, Belanja, dll)
+                    const h = (headerRow[j]||'').toString().toLowerCase();
+                    if(h.includes('nama') || h.includes('uraian') || h.includes('pekerjaan') || h.includes('paket') || h.includes('kegiatan') || h.includes('belanja')) {
+                        cellStyle += 'white-space: normal; min-width: 160px; max-width: 300px; word-wrap: break-word; vertical-align: top; font-size: 0.85rem;';
+                    } else if (!isSticky) {
+                        cellStyle += 'white-space: normal; min-width: 100px; max-width: 200px; word-wrap: break-word; vertical-align: top; font-size: 0.85rem;';
+                    }
+
+                    html += `<td style="${cellStyle}">${cell}</td>`;
+                }
                 html += '</tr>';
             }
             html += '</tbody></table></div>';
