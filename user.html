@@ -540,6 +540,22 @@ iframe {
         grid-template-columns: 1fr;
     }
 }
+
+/* Column Resizer */
+.resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    cursor: col-resize;
+    user-select: none;
+    height: 100%;
+    z-index: 25;
+}
+.resizer:hover, .resizing {
+    background-color: #0ea5e9;
+    width: 7px;
+}
 </style>
 </head>
 <body>
@@ -610,6 +626,12 @@ iframe {
                     <button class="btn-icon" onclick="refreshIframe()" title="Refresh Data">
                         <i class="fas fa-sync-alt"></i>
                     </button>
+                    <button class="btn-icon" onclick="adjustTableSize(1)" title="Perbesar Tabel">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="btn-icon" onclick="adjustTableSize(-1)" title="Perkecil Tabel">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
     <button class="btn-icon" onclick="manualSync()" title="Sinkronisasi Cloud (Ambil Data Terbaru)">
         <i class="fas fa-cloud-download-alt"></i>
     </button>
@@ -675,6 +697,7 @@ iframe {
     <script>
         let currentSection = 'RPD';
         window.smartTableData = []; // Menyimpan data mentah tabel (PBJ/E-PERWABKU)
+        window.currentTableFontSize = 0.85; // Default ukuran font tabel
 
         // KONFIGURASI CLOUD
         // KEAMANAN: Saat ini masih pakai Master Key ($2a$). Sangat disarankan buat "Access Key" (Read Only) di JSONBin.io
@@ -925,6 +948,21 @@ iframe {
                 icon.className = 'fas fa-compress';
                 btn.title = "Keluar Mode Fokus";
             }
+        }
+
+        function adjustTableSize(step) {
+            window.currentTableFontSize += (step * 0.05);
+            if (window.currentTableFontSize < 0.6) window.currentTableFontSize = 0.6;
+            if (window.currentTableFontSize > 1.3) window.currentTableFontSize = 1.3;
+
+            const tables = document.querySelectorAll('table.native-table');
+            tables.forEach(table => {
+                const cells = table.querySelectorAll('th, td');
+                cells.forEach(cell => {
+                    cell.style.fontSize = window.currentTableFontSize.toFixed(2) + 'rem';
+                });
+            });
+            showToast(`Ukuran tabel diubah`);
         }
 
         // --- LOGIKA RPD (Pencairan & Kesimpulan) ---
@@ -1556,11 +1594,12 @@ iframe {
                 // Deteksi kolom No agar tidak terlalu lebar, dan kolom Nama agar cukup lebar
                 // Sticky kolom pertama (biasanya No)
                 if(index === 0 || c === 'no' || c === 'no.' || c === 'nomor') style = 'width: 50px; min-width: 50px; text-align: center; position: sticky; left: 0; z-index: 21;';
-                else if(c.includes('nama') || c.includes('uraian') || c.includes('pekerjaan') || c.includes('paket') || c.includes('kegiatan') || c.includes('belanja')) style = 'min-width: 160px; max-width: 300px; white-space: normal; font-size: 0.85rem;';
-                else style = 'min-width: 100px; max-width: 200px; white-space: normal; font-size: 0.85rem;';
+                else if(c.includes('nama') || c.includes('uraian') || c.includes('pekerjaan') || c.includes('paket') || c.includes('kegiatan') || c.includes('belanja')) style = 'min-width: 160px; max-width: 300px; white-space: normal; font-size: ' + window.currentTableFontSize + 'rem;';
+                else if(c.includes('metode') || c.includes('ls & up') || c.includes('nilai yang dibayarkan') || c.includes('tanggal bastp') || c.includes('keterangan')) style = 'min-width: 80px; max-width: 100px; white-space: normal; font-size: ' + window.currentTableFontSize + 'rem;';
+                else style = 'min-width: 100px; max-width: 200px; white-space: normal; font-size: ' + window.currentTableFontSize + 'rem;';
 
                 // Center alignment untuk kolom Metode Pembayaran
-                if(c.includes('metode') || c.includes('ls & up')) style += ' text-align: center;';
+                if(c.includes('metode') || c.includes('ls & up') || c.includes('nilai yang dibayarkan')) style += ' text-align: center;';
 
                 html += `<th style="${style}">${cell}</th>`;
             });
@@ -1595,13 +1634,15 @@ iframe {
                     // Cek header untuk wrapping text pada kolom panjang (Kegiatan, Belanja, dll)
                     const h = (headerRow[j]||'').toString().toLowerCase();
                     if(h.includes('nama') || h.includes('uraian') || h.includes('pekerjaan') || h.includes('paket') || h.includes('kegiatan') || h.includes('belanja')) {
-                        cellStyle += 'white-space: normal; min-width: 160px; max-width: 300px; word-wrap: break-word; vertical-align: top; font-size: 0.85rem;';
+                        cellStyle += 'white-space: normal; min-width: 160px; max-width: 300px; word-wrap: break-word; vertical-align: top; font-size: ' + window.currentTableFontSize + 'rem;';
+                    } else if(h.includes('metode') || h.includes('ls & up') || h.includes('nilai yang dibayarkan') || h.includes('tanggal bastp') || h.includes('keterangan')) {
+                        cellStyle += 'white-space: normal; min-width: 80px; max-width: 100px; word-wrap: break-word; vertical-align: top; font-size: ' + window.currentTableFontSize + 'rem;';
                     } else if (!isSticky) {
-                        cellStyle += 'white-space: normal; min-width: 100px; max-width: 200px; word-wrap: break-word; vertical-align: top; font-size: 0.85rem;';
+                        cellStyle += 'white-space: normal; min-width: 100px; max-width: 200px; word-wrap: break-word; vertical-align: top; font-size: ' + window.currentTableFontSize + 'rem;';
                     }
 
                     // Center alignment untuk kolom Metode Pembayaran
-                    if(h.includes('metode') || h.includes('ls & up')) cellStyle += ' text-align: center;';
+                    if(h.includes('metode') || h.includes('ls & up') || h.includes('nilai yang dibayarkan')) cellStyle += ' text-align: center;';
 
                     if (isRed) cellStyle += 'color: #b91c1c;'; // Text merah gelap
 
@@ -1612,6 +1653,7 @@ iframe {
             html += '</tbody></table></div>';
 
             container.innerHTML = html;
+            setTimeout(() => enableColumnResizing(document.getElementById('pbjTable')), 0);
         }
 
         function populateSidebarFromTable(rows) {
@@ -2533,6 +2575,48 @@ iframe {
                     }
                 });
             }
+        }
+
+        function enableColumnResizing(table) {
+            if (!table) return;
+            const cols = table.querySelectorAll('th');
+            cols.forEach(col => {
+                const resizer = document.createElement('div');
+                resizer.classList.add('resizer');
+                col.appendChild(resizer);
+
+                let x = 0;
+                let w = 0;
+
+                const mouseDownHandler = function(e) {
+                    x = e.clientX;
+                    const styles = window.getComputedStyle(col);
+                    w = parseInt(styles.width, 10);
+
+                    document.addEventListener('mousemove', mouseMoveHandler);
+                    document.addEventListener('mouseup', mouseUpHandler);
+                    resizer.classList.add('resizing');
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                };
+
+                const mouseMoveHandler = function(e) {
+                    const dx = e.clientX - x;
+                    col.style.width = `${w + dx}px`;
+                    col.style.minWidth = `${w + dx}px`;
+                    col.style.maxWidth = 'none'; 
+                };
+
+                const mouseUpHandler = function() {
+                    document.removeEventListener('mousemove', mouseMoveHandler);
+                    document.removeEventListener('mouseup', mouseUpHandler);
+                    resizer.classList.remove('resizing');
+                    document.body.style.removeProperty('cursor');
+                    document.body.style.removeProperty('user-select');
+                };
+
+                resizer.addEventListener('mousedown', mouseDownHandler);
+            });
         }
 
         // --- FITUR NOTIFIKASI KONTRAK (PBJ) ---
