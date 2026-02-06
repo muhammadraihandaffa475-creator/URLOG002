@@ -1543,6 +1543,9 @@ iframe {
             const headerRow = rows[0];
             const colCount = headerRow.length;
 
+            // Cari index kolom SUBSATKER untuk highlight
+            const subsatkerIdx = headerRow.findIndex(h => h && h.toString().toUpperCase().includes('SUBSATKER'));
+
             let html = '<div class="native-table-wrapper"><table class="native-table" id="pbjTable">';
             
             // Header (Baris pertama)
@@ -1555,6 +1558,10 @@ iframe {
                 if(index === 0 || c === 'no' || c === 'no.' || c === 'nomor') style = 'width: 50px; min-width: 50px; text-align: center; position: sticky; left: 0; z-index: 21;';
                 else if(c.includes('nama') || c.includes('uraian') || c.includes('pekerjaan') || c.includes('paket') || c.includes('kegiatan') || c.includes('belanja')) style = 'min-width: 160px; max-width: 300px; white-space: normal; font-size: 0.85rem;';
                 else style = 'min-width: 100px; max-width: 200px; white-space: normal; font-size: 0.85rem;';
+
+                // Center alignment untuk kolom Metode Pembayaran
+                if(c.includes('metode') || c.includes('ls & up')) style += ' text-align: center;';
+
                 html += `<th style="${style}">${cell}</th>`;
             });
             html += '</tr></thead>';
@@ -1565,12 +1572,25 @@ iframe {
                 // Skip baris kosong
                 if (rows[i].length === 1 && (!rows[i][0] || rows[i][0] === '')) continue;
                 
-                html += '<tr>';
+                // Cek Highlight Merah (Diawali huruf X)
+                let isRed = false;
+                if (subsatkerIdx !== -1 && rows[i][subsatkerIdx]) {
+                    const val = rows[i][subsatkerIdx].toString().toUpperCase().trim();
+                    if (val.startsWith('X')) isRed = true;
+                }
+
+                const rowStyle = isRed ? 'background-color: #fee2e2;' : '';
+
+                html += `<tr style="${rowStyle}">`;
                 for (let j = 0; j < colCount; j++) {
                     const cell = rows[i][j] || '';
                     // Sticky kolom pertama
                     const isSticky = (j === 0);
-                    let cellStyle = isSticky ? 'position: sticky; left: 0; z-index: 10; font-weight: 600; text-align: center; background: #fff; border-right: 2px solid #e2e8f0;' : '';
+                    let cellStyle = isSticky ? 'position: sticky; left: 0; z-index: 10; font-weight: 600; text-align: center; border-right: 2px solid #e2e8f0;' : '';
+                    
+                    if (isSticky) {
+                        cellStyle += isRed ? 'background: #fee2e2;' : 'background: #fff;';
+                    }
                     
                     // Cek header untuk wrapping text pada kolom panjang (Kegiatan, Belanja, dll)
                     const h = (headerRow[j]||'').toString().toLowerCase();
@@ -1579,6 +1599,11 @@ iframe {
                     } else if (!isSticky) {
                         cellStyle += 'white-space: normal; min-width: 100px; max-width: 200px; word-wrap: break-word; vertical-align: top; font-size: 0.85rem;';
                     }
+
+                    // Center alignment untuk kolom Metode Pembayaran
+                    if(h.includes('metode') || h.includes('ls & up')) cellStyle += ' text-align: center;';
+
+                    if (isRed) cellStyle += 'color: #b91c1c;'; // Text merah gelap
 
                     html += `<td style="${cellStyle}">${cell}</td>`;
                 }
