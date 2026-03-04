@@ -586,6 +586,145 @@ iframe {
     border-color: #ef4444;
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
+
+/* --- RESPONSIVE MOBILE (HP) --- */
+@media (max-width: 768px) {
+    body { height: auto; overflow-y: auto; } /* Allow body scroll on mobile */
+    
+    .navbar {
+        flex-direction: column;
+        height: auto;
+        padding: 15px;
+        margin: 10px;
+        gap: 15px;
+    }
+    .nav-brand {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+    .tabs {
+        width: 100%;
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 5px;
+        -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
+    }
+    .tabs::-webkit-scrollbar { height: 4px; }
+    .tab-btn {
+        white-space: nowrap;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .btn-back { display: none; } /* Sembunyikan tombol kembali di mobile */
+
+    .main-content { padding: 10px; height: auto; overflow: visible; }
+    .glass-panel { border-radius: 16px; height: auto; min-height: 80vh; overflow: visible; }
+    
+    .panel-header { padding: 0 10px; overflow-x: auto; }
+    .header-actions { gap: 5px; }
+    .btn-icon { width: 30px; height: 30px; font-size: 0.9rem; }
+
+    /* Layout PBJ Mobile */
+    .pbj-layout { height: auto; overflow: visible; }
+    
+    .pbj-stats-row {
+        height: auto !important;
+        padding: 15px;
+    }
+    #pbjStatsContent {
+        flex-direction: column;
+        height: auto !important;
+        gap: 20px;
+    }
+    #pbjStatsContent > div { width: 100%; height: auto; }
+    #pbjChart { height: 250px !important; }
+    #groupingList { max-height: 250px; }
+
+    .pbj-content-row {
+        flex-direction: column;
+        height: auto;
+    }
+    .pbj-sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        border-left: none;
+        border-top: 1px solid rgba(226, 232, 240, 0.8);
+        order: 2; /* Sidebar pindah ke bawah */
+    }
+    #iframeContainer {
+        height: auto; /* Biarkan memanjang agar scroll menggunakan body */
+        order: 1;
+    }
+
+    /* RPD Mobile */
+    .rpd-sub-nav { flex-wrap: wrap; gap: 5px; }
+    .rpd-sub-btn { font-size: 0.75rem; padding: 6px 12px; flex: 1; justify-content: center; }
+
+    /* Mobile Table Card View */
+    .native-table thead { display: none; }
+    .native-table, .native-table tbody, .native-table tr, .native-table td { display: block; width: 100%; }
+    .native-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .native-table td {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: flex-start;
+        text-align: right !important;
+        padding: 8px 0 !important;
+        border: none !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        position: static !important;
+        background: transparent !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+    .native-table td:last-child { border-bottom: none !important; }
+    .native-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #64748b;
+        text-align: left;
+        padding-right: 10px;
+        flex: 0 0 40%;
+        font-size: 0.85rem;
+    }
+    /* Highlight row style override */
+    .native-table tr[style*="background-color: #fee2e2;"] {
+        background-color: #fee2e2 !important;
+        border-color: #fca5a5;
+    }
+
+    /* Mobile Sticky Search */
+    .mobile-search-container {
+        display: block !important;
+        position: sticky;
+        top: 10px;
+        z-index: 99;
+        margin-bottom: 15px;
+        background: rgba(240, 249, 255, 0.9);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        padding: 5px;
+    }
+    .mobile-search-container .sidebar-search {
+        margin-bottom: 0;
+        border: 1px solid #cbd5e1;
+        background: white;
+    }
+}
 </style>
 </head>
 <body>
@@ -1619,6 +1758,15 @@ iframe {
 
             let html = '<div class="native-table-wrapper"><table class="native-table" id="pbjTable">';
             
+            // Inject Mobile Search Bar (Hidden on Desktop via CSS)
+            html = `
+            <div class="mobile-search-container" style="display: none;">
+                <div class="sidebar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Cari data..." onkeyup="filterTable(this.value)">
+                </div>
+            </div>` + html;
+
             // Header (Baris pertama)
             html += '<thead><tr>';
             headerRow.forEach((cell, index) => {
@@ -1679,7 +1827,9 @@ iframe {
 
                     if (isRed) cellStyle += 'color: #b91c1c;'; // Text merah gelap
 
-                    html += `<td style="${cellStyle}">${cell}</td>`;
+                    // Tambahkan data-label untuk tampilan mobile card view
+                    const headerLabel = (headerRow[j] || '').toString().replace(/"/g, '&quot;');
+                    html += `<td style="${cellStyle}" data-label="${headerLabel}">${cell}</td>`;
                 }
                 html += '</tr>';
             }
@@ -1842,6 +1992,10 @@ iframe {
             
             const trs = table.getElementsByTagName('tr');
             const filter = query.toLowerCase();
+
+            // Sync semua input search (Desktop & Mobile)
+            const searchInputs = document.querySelectorAll('.sidebar-search input');
+            searchInputs.forEach(input => { if(input.value !== query) input.value = query; });
 
             // Persiapan Filter Tanggal (Jika Aktif)
             let dateColIdx = -1;
