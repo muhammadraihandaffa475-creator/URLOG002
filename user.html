@@ -556,6 +556,36 @@ iframe {
     background-color: #0ea5e9;
     width: 7px;
 }
+
+/* Filter Button Style */
+.btn-filter-warning {
+    width: 100%;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #fca5a5;
+    color: #ef4444;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+.btn-filter-warning:hover {
+    background: #fef2f2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+.btn-filter-warning.active {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    border-color: #ef4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
 </style>
 </head>
 <body>
@@ -684,6 +714,9 @@ iframe {
                             <i class="fas fa-hashtag"></i>
                             <input type="number" placeholder="Grafik per No. Urut..." oninput="updateChartByRow(this.value)">
                         </div>
+                        <button class="btn-filter-warning" onclick="toggleExpiringFilter()" id="btnFilterExpiring">
+                            <i class="fas fa-exclamation-triangle"></i> Filter Jatuh Tempo
+                        </button>
                         <ul class="data-list" id="latestDataList">
                             <!-- Data akan diisi oleh JS -->
                         </ul>
@@ -1782,12 +1815,50 @@ iframe {
             }
         }
 
+        let isExpiringFilterActive = false;
+
+        function toggleExpiringFilter() {
+            isExpiringFilterActive = !isExpiringFilterActive;
+            const btn = document.getElementById('btnFilterExpiring');
+            
+            if (isExpiringFilterActive) {
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Menampilkan Jatuh Tempo';
+                showToast("Filter Aktif: Menampilkan kontrak H-5 & Expired");
+            } else {
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Filter Jatuh Tempo';
+                showToast("Filter Nonaktif: Menampilkan semua data");
+            }
+            
+            // Trigger filter ulang dengan query pencarian yang ada (jika ada)
+            const searchInput = document.querySelector('.sidebar-search input[placeholder="Cari di tabel..."]');
+            filterTable(searchInput ? searchInput.value : '');
+        }
+
         function filterTable(query) {
             const table = document.getElementById('pbjTable');
             if (!table) return;
             
             const trs = table.getElementsByTagName('tr');
             const filter = query.toLowerCase();
+
+            // Persiapan Filter Tanggal (Jika Aktif)
+            let dateColIdx = -1;
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const maxDate = new Date(today); maxDate.setDate(today.getDate() + 5);
+
+            if (isExpiringFilterActive) {
+                const headers = Array.from(table.querySelectorAll('th')).map(th => th.innerText.toUpperCase());
+                dateColIdx = headers.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU') || h.includes('TGL SELESAI') || h.includes('TANGGAL SELESAI') || h.includes('TGL AKHIR') || h.includes('TANGGAL AKHIR'));
+                
+                if (dateColIdx === -1) {
+                    showToast("Kolom tanggal kontrak tidak ditemukan.", true);
+                    // Matikan filter jika kolom tidak ketemu
+                    isExpiringFilterActive = false;
+                    document.getElementById('btnFilterExpiring').classList.remove('active');
+                }
+            }
             
             // Kumpulkan data baris yang terlihat untuk update chart
             let visibleRows = [];
@@ -1810,8 +1881,25 @@ iframe {
                     rowData.push(td.textContent);
                 }
 
-                // Cek apakah baris mengandung text query
-                if (rowText.toLowerCase().includes(filter)) {
+                // 1. Cek Text Search
+                const matchesSearch = rowText.toLowerCase().includes(filter);
+                
+                // 2. Cek Filter Tanggal (Expiring)
+                let matchesDate = true;
+                if (isExpiringFilterActive && dateColIdx !== -1) {
+                    if (tds.length > dateColIdx) {
+                        const dateStr = tds[dateColIdx].innerText.trim();
+                        const contractDate = parseIndonesianDate(dateStr);
+                        if (contractDate) {
+                            contractDate.setHours(0, 0, 0, 0);
+                            // Tampilkan jika <= H+5 (Expired atau akan jatuh tempo)
+                            if (contractDate > maxDate) matchesDate = false; 
+                        } else { matchesDate = false; } // Sembunyikan jika tanggal tidak valid
+                    } else { matchesDate = false; }
+                }
+
+                // Gabungkan kedua kondisi
+                if (matchesSearch && matchesDate) {
                     tr.style.display = '';
                     visibleRows.push(rowData);
                 } else {
@@ -2655,7 +2743,7 @@ iframe {
             
             for(let i = 0; i < Math.min(rows.length, 5); i++) {
                 const rowUpper = rows[i].map(h => (h||'').toString().toUpperCase());
-                const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU'));
+                const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU') || h.includes('TGL SELESAI') || h.includes('TANGGAL SELESAI') || h.includes('TGL AKHIR') || h.includes('TANGGAL AKHIR'));
                 if(idx !== -1) {
                     headerRowIdx = i;
                     dateColIdx = idx;
@@ -2670,9 +2758,9 @@ iframe {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Cek sampai 7 hari ke depan
+            // Cek sampai 5 hari ke depan (H-5)
             const maxDate = new Date(today);
-            maxDate.setDate(today.getDate() + 7);
+            maxDate.setDate(today.getDate() + 5);
 
             const expiringContracts = [];
 
@@ -2686,20 +2774,32 @@ iframe {
                 if (contractDate) {
                     contractDate.setHours(0, 0, 0, 0);
                     
-                    // Cek jika tanggal kontrak >= hari ini DAN <= 7 hari ke depan
-                    if (contractDate >= today && contractDate <= maxDate) {
+                    // Cek jika tanggal kontrak <= 5 hari ke depan (termasuk yang sudah lewat/expired)
+                    if (contractDate <= maxDate) {
                         // Cari nama pekerjaan
                         let nameIdx = headers.findIndex(h => h.includes('NAMA') || h.includes('PEKERJAAN') || h.includes('KEGIATAN') || h.includes('PAKET') || h.includes('URAIAN'));
                         if (nameIdx === -1) nameIdx = 1; // Fallback ke kolom ke-2
                         
                         const contractName = row[nameIdx] || 'Kontrak Tanpa Nama';
                         
-                        // Hitung selisih hari
-                        const diffTime = Math.abs(contractDate - today);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                        const statusMsg = diffDays === 0 ? "HARI INI" : `${diffDays} hari lagi`;
+                        let statusMsg = "";
+                        let badgeColor = "";
 
-                        expiringContracts.push({ name: contractName, date: dateStr, status: statusMsg });
+                        if (contractDate < today) {
+                            // Sudah lewat (Expired)
+                            const diffTime = Math.abs(today - contractDate);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            statusMsg = `Telat ${diffDays} hari`;
+                            badgeColor = "color: #b91c1c; background: #fecaca;"; // Merah gelap
+                        } else {
+                            // Akan jatuh tempo
+                            const diffTime = Math.abs(contractDate - today);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                            statusMsg = diffDays === 0 ? "HARI INI" : `${diffDays} hari lagi`;
+                            badgeColor = "color: #ef4444; background: #fef2f2;"; // Merah terang
+                        }
+
+                        expiringContracts.push({ name: contractName, date: dateStr, status: statusMsg, badgeColor: badgeColor });
                     }
                 }
             }
@@ -2711,23 +2811,23 @@ iframe {
             if (!dateStr) return null;
             dateStr = dateStr.trim();
             
-            // Coba format YYYY-MM-DD (ISO)
-            let isoMatch = dateStr.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+            // 1. Format YYYY-MM-DD (ISO) - Support . / -
+            let isoMatch = dateStr.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
             if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
 
-            dateStr = dateStr.toLowerCase().replace(/,/g, '');
+            let cleanStr = dateStr.toLowerCase().replace(/,/g, '');
             
-            // Format: DD/MM/YYYY
-            let parts = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            // 2. Format: DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+            let parts = cleanStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
             if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
 
-            // Format: DD Bulan YYYY
-            parts = dateStr.split(' ');
-            if (parts.length >= 3) {
-                const day = parseInt(parts[0]);
-                const monthStr = parts[1];
-                const year = parseInt(parts[2]);
-                const months = { 'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11, 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'jun': 5, 'jul': 6, 'agu': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'des': 11 };
+            // 3. Format: DD Bulan YYYY
+            let textParts = cleanStr.split(/[\s\-]+/);
+            if (textParts.length >= 3) {
+                const day = parseInt(textParts[0]);
+                const monthStr = textParts[1];
+                const year = parseInt(textParts[2]);
+                const months = { 'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11, 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'jun': 5, 'jul': 6, 'agu': 7, 'aug': 7, 'sep': 8, 'okt': 9, 'oct': 9, 'nov': 10, 'des': 11, 'dec': 11 };
                 if (!isNaN(day) && !isNaN(year) && months[monthStr] !== undefined) return new Date(year, months[monthStr], day);
             }
             
@@ -2805,10 +2905,14 @@ iframe {
             
             let listHtml = '<ul style="margin: 8px 0 0; padding: 0; list-style: none; max-height: 120px; overflow-y: auto;">';
             contracts.forEach(c => {
+                const badgeStyle = c.badgeColor 
+                    ? `font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; ${c.badgeColor}`
+                    : "font-size: 0.7rem; font-weight: 700; color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 20px;";
+                const safeName = c.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 listHtml += `
-                <li style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #475569;">
+                <li onclick="focusContract('${safeName}')" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #475569; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                     <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">${c.name}</span>
-                    <span style="font-size: 0.7rem; font-weight: 700; color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 20px;">${c.status}</span>
+                    <span style="${badgeStyle}">${c.status}</span>
                 </li>`;
             });
             listHtml += '</ul>';
@@ -2837,6 +2941,29 @@ iframe {
             setTimeout(() => {
                 if(alertBox.parentElement) dismissNotif(alertBox.querySelector('button'));
             }, 8000);
+        }
+
+        function focusContract(name) {
+            // Tutup notifikasi
+            const btn = document.querySelector('.notif-mobile-card button');
+            if(btn) dismissNotif(btn);
+
+            // Pindah ke tab PBJ
+            switchTab('PBJ');
+
+            // Tunggu tabel siap lalu filter
+            const checkInterval = setInterval(() => {
+                const searchInput = document.querySelector('.sidebar-search input[placeholder="Cari di tabel..."]');
+                if (document.getElementById('pbjTable') && searchInput) {
+                    searchInput.value = name;
+                    filterTable(name);
+                    clearInterval(checkInterval);
+                    showToast(`Menampilkan kontrak: ${name}`);
+                }
+            }, 500);
+            
+            // Timeout 10 detik jika gagal load
+            setTimeout(() => clearInterval(checkInterval), 10000);
         }
 
         window.dismissNotif = function(btn) {
@@ -2893,7 +3020,10 @@ iframe {
             }
 
             // Fallback ke simulasi jika tidak ada URL atau error
-            const dummyContracts = [{ name: "Contoh: Pengadaan Laptop (Simulasi)", status: "HARI INI" }, { name: "Contoh: Renovasi Gedung (Simulasi)", status: "3 hari lagi" }];
+            const dummyContracts = [
+                { name: "Contoh: Pengadaan Laptop (Simulasi)", status: "HARI INI", badgeColor: "color: #ef4444; background: #fef2f2;" }, 
+                { name: "Contoh: Renovasi Gedung (Simulasi)", status: "Telat 3 hari", badgeColor: "color: #b91c1c; background: #fecaca;" }
+            ];
             showContractNotification(dummyContracts);
             updateNotifButton(dummyContracts);
             sendBrowserNotification(dummyContracts);
