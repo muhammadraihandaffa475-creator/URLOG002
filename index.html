@@ -435,7 +435,7 @@
     let headerRowIdx = -1, dateColIdx = -1;
     for(let i = 0; i < Math.min(rows.length, 5); i++) {
         const rowUpper = rows[i].map(h => (h||'').toString().toUpperCase());
-        const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO'));
+        const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU') || h.includes('TGL SELESAI') || h.includes('TANGGAL SELESAI') || h.includes('TGL AKHIR') || h.includes('TANGGAL AKHIR'));
         if(idx !== -1) { headerRowIdx = i; dateColIdx = idx; break; }
     }
     if (headerRowIdx === -1) return;
@@ -445,7 +445,7 @@
     if (nameIdx === -1) nameIdx = 1;
 
     const today = new Date(); today.setHours(0,0,0,0);
-    const maxDate = new Date(today); maxDate.setDate(today.getDate() + 7);
+    const maxDate = new Date(today); maxDate.setDate(today.getDate() + 5);
 
     pbjData = [];
     for (let i = headerRowIdx + 1; i < rows.length; i++) {
@@ -455,14 +455,27 @@
         let contractDate = parseIndonesianDate(dateStr);
         if (contractDate) {
             contractDate.setHours(0,0,0,0);
-            if (contractDate >= today && contractDate <= maxDate) {
-                const diffTime = Math.abs(contractDate - today);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                const statusMsg = diffDays === 0 ? "Hari Ini" : `${diffDays} hari lagi`;
+            
+            // Cek jika tanggal kontrak <= 5 hari ke depan (termasuk yang sudah lewat/expired)
+            if (contractDate <= maxDate) {
+                let statusMsg = "";
+                let notifTitle = "Peringatan Kontrak";
+                
+                if (contractDate < today) {
+                    const diffTime = Math.abs(today - contractDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    statusMsg = `Telat ${diffDays} hari`;
+                    notifTitle = "Kontrak Expired";
+                } else {
+                    const diffTime = Math.abs(contractDate - today);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    statusMsg = diffDays === 0 ? "Hari Ini" : `${diffDays} hari lagi`;
+                }
+
                 const name = row[nameIdx] || 'Tanpa Nama';
                 pbjData.push({
-                    type: 'warning', title: 'Peringatan Kontrak',
-                    desc: `Kontrak "${name}" berakhir dalam ${statusMsg}.`,
+                    type: 'warning', title: notifTitle,
+                    desc: `Kontrak "${name}" - ${statusMsg}.`,
                     time: statusMsg, read: false,
                     link: `user.html?tab=PBJ&search=${encodeURIComponent(name)}`
                 });
@@ -476,15 +489,15 @@
   function parseIndonesianDate(dateStr) {
       if (!dateStr) return null;
       dateStr = dateStr.trim();
-      let isoMatch = dateStr.match(/^(\d{4})\/\-\/\-$/);
+      let isoMatch = dateStr.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
       if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
-      dateStr = dateStr.toLowerCase().replace(/,/g, '');
-      let parts = dateStr.match(/^(\d{1,2})\/\-\/\-$/);
+      let cleanStr = dateStr.toLowerCase().replace(/,/g, '');
+      let parts = cleanStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
       if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
-      parts = dateStr.split(' ');
-      if (parts.length >= 3) {
-          const day = parseInt(parts[0]); const monthStr = parts[1]; const year = parseInt(parts[2]);
-          const months = { 'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11, 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'jun': 5, 'jul': 6, 'agu': 7, 'sep': 8, 'okt': 9, 'nov': 10, 'des': 11 };
+      let textParts = cleanStr.split(/[\s\-]+/);
+      if (textParts.length >= 3) {
+          const day = parseInt(textParts[0]); const monthStr = textParts[1]; const year = parseInt(textParts[2]);
+          const months = { 'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7, 'september': 8, 'oktober': 9, 'november': 10, 'desember': 11, 'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'jun': 5, 'jul': 6, 'agu': 7, 'aug': 7, 'sep': 8, 'okt': 9, 'oct': 9, 'nov': 10, 'des': 11, 'dec': 11 };
           if (!isNaN(day) && !isNaN(year) && months[monthStr] !== undefined) return new Date(year, months[monthStr], day);
       }
       const d = new Date(dateStr); return isNaN(d.getTime()) ? null : d;
