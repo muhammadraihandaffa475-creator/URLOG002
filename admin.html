@@ -658,13 +658,16 @@ tr:last-child td { border-bottom: none; }
             // Cari baris header yang mengandung kata kunci tanggal kontrak (Scan 5 baris pertama)
             let headerRowIdx = -1;
             let dateColIdx = -1;
+            let bastpColIdx = -1;
             
             for(let i = 0; i < Math.min(rows.length, 5); i++) {
                 const rowUpper = rows[i].map(h => (h||'').toString().toUpperCase());
-                const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU') || h.includes('TGL SELESAI') || h.includes('TANGGAL SELESAI') || h.includes('TGL AKHIR') || h.includes('TANGGAL AKHIR'));
+                const idx = rowUpper.findIndex(h => (h.includes('AKHIR') || h.includes('SELESAI') || h.includes('JATUH TEMPO') || h.includes('BATAS') || h.includes('BERAKHIR')) && !h.includes('STATUS') && !h.includes('KET'));
+                const idxBastp = rowUpper.findIndex(h => h.includes('BASTP') || h.includes('SERAH TERIMA') || h.includes('PHO') || h.includes('BERITA ACARA') || h.includes('TGL BAST') || h.includes('TANGGAL BAST') || h.includes('STATUS') || h.includes('KETERANGAN') || h.includes('KET.'));
                 if(idx !== -1) {
                     headerRowIdx = i;
                     dateColIdx = idx;
+                    bastpColIdx = idxBastp;
                     break;
                 }
             }
@@ -681,10 +684,22 @@ tr:last-child td { border-bottom: none; }
             for (let i = headerRowIdx + 1; i < rows.length; i++) {
                 const row = rows[i];
                 if (!row[dateColIdx]) continue;
+
+                // Cek Status BASTP
+                let isBastpClear = false;
+                if (bastpColIdx !== -1 && row[bastpColIdx]) {
+                    const bastpStr = row[bastpColIdx].trim();
+                    const upperStr = bastpStr.toUpperCase();
+                    if ((bastpStr.length > 4 && parseIndonesianDate(bastpStr)) || upperStr.includes('SUDAH') || upperStr.includes('SELESAI') || upperStr.includes('LENGKAP') || upperStr.includes('OK') || upperStr.includes('ADA')) isBastpClear = true;
+                    if (upperStr.includes('BELUM')) isBastpClear = false;
+                }
+                if (isBastpClear) continue;
+
                 const dateStr = row[dateColIdx].trim();
                 let contractDate = parseIndonesianDate(dateStr);
                 if (contractDate) {
                     contractDate.setHours(0, 0, 0, 0);
+                    // LOGIKA: Tampilkan jika (Expired/Masa Lalu) ATAU (H-5 ke depan)
                     if (contractDate <= maxDate) {
                         let nameIdx = headers.findIndex(h => h.includes('NAMA') || h.includes('PEKERJAAN') || h.includes('KEGIATAN') || h.includes('PAKET') || h.includes('URAIAN'));
                         if (nameIdx === -1) nameIdx = 1;
@@ -697,13 +712,13 @@ tr:last-child td { border-bottom: none; }
                             // Sudah lewat (Expired)
                             const diffTime = Math.abs(today - contractDate);
                             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                            statusMsg = `Telat ${diffDays} hari`;
+                            statusMsg = `Telat ${diffDays} hari (BASTP Belum)`;
                             badgeColor = "color: #b91c1c; background: #fecaca;"; // Merah gelap
                         } else {
                             // Akan jatuh tempo
                             const diffTime = Math.abs(contractDate - today);
                             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                            statusMsg = diffDays === 0 ? "HARI INI" : `${diffDays} hari lagi`;
+                            statusMsg = diffDays === 0 ? "HARI INI (BASTP Belum)" : `${diffDays} hari lagi (BASTP Belum)`;
                             badgeColor = "color: #ef4444; background: #fef2f2;"; // Merah terang
                         }
 
@@ -719,13 +734,13 @@ tr:last-child td { border-bottom: none; }
             dateStr = dateStr.trim();
             
             // 1. Format YYYY-MM-DD (ISO)
-            let isoMatch = dateStr.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+            let isoMatch = dateStr.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
             if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
 
             let cleanStr = dateStr.toLowerCase().replace(/,/g, '');
             
             // 2. Format: DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
-            let parts = cleanStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+            let parts = cleanStr.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
             if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
 
             // 3. Format: DD Bulan YYYY
@@ -823,11 +838,11 @@ tr:last-child td { border-bottom: none; }
                 </div>
                 <div style="flex: 1;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #0f172a;">Peringatan Kontrak</h4>
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #0f172a;">Peringatan BASTP</h4>
                         <span style="font-size: 0.75rem; color: #94a3b8;">Baru saja</span>
                     </div>
                     <p style="margin: 0; font-size: 0.9rem; color: #64748b; line-height: 1.4;">
-                        Terdapat <strong style="color: #ef4444;">${contracts.length} kontrak</strong> mendekati jatuh tempo.
+                        Terdapat <strong style="color: #ef4444;">${contracts.length} kontrak</strong> dengan BASTP belum clear (Hampir/Sudah Jatuh Tempo).
                     </p>
                     ${listHtml}
                 </div>
@@ -899,8 +914,8 @@ tr:last-child td { border-bottom: none; }
 
             // Fallback Simulasi
             const dummyContracts = [
-                { name: "Contoh: Pengadaan Laptop (Simulasi)", status: "HARI INI", badgeColor: "color: #ef4444; background: #fef2f2;" }, 
-                { name: "Contoh: Renovasi Gedung (Simulasi)", status: "Telat 3 hari", badgeColor: "color: #b91c1c; background: #fecaca;" }
+                { name: "Contoh: Laptop (Akan Jatuh Tempo)", status: "HARI INI (BASTP Belum)", badgeColor: "color: #ef4444; background: #fef2f2;" }, 
+                { name: "Contoh: Gedung (Sudah Expired)", status: "Telat 5 hari (BASTP Belum)", badgeColor: "color: #b91c1c; background: #fecaca;" }
             ];
             showContractNotification(dummyContracts);
             updateAdminBell(dummyContracts);
@@ -910,9 +925,9 @@ tr:last-child td { border-bottom: none; }
         function sendBrowserNotification(contracts) {
             if (!("Notification" in window)) return;
 
-            const title = "Admin: Peringatan Kontrak";
+            const title = "Admin: Peringatan BASTP";
             const options = {
-                body: `Perhatian! Ada ${contracts.length} kontrak yang perlu ditinjau.`,
+                body: `Perhatian! Ada ${contracts.length} kontrak BASTP belum clear (Hampir/Sudah Jatuh Tempo).`,
                 icon: "https://yt3.ggpht.com/a/AATXAJwDikBj_PcvGKe5caluqknHoXgqXk7I5vY1CqY9=s900-c-k-c0xffffffff-no-rj-mo",
                 requireInteraction: true
             };
