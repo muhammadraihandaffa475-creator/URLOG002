@@ -440,11 +440,12 @@
   function generateNotifications(rows) {
     if (!rows || rows.length < 2) return;
     
-    let headerRowIdx = -1, dateColIdx = -1;
+    let headerRowIdx = -1, dateColIdx = -1, bastpColIdx = -1;
     for(let i = 0; i < Math.min(rows.length, 5); i++) {
         const rowUpper = rows[i].map(h => (h||'').toString().toUpperCase());
-        const idx = rowUpper.findIndex(h => h.includes('AKHIR KONTRAK') || h.includes('SELESAI KONTRAK') || h.includes('JATUH TEMPO') || h.includes('BATAS WAKTU') || h.includes('TGL SELESAI') || h.includes('TANGGAL SELESAI') || h.includes('TGL AKHIR') || h.includes('TANGGAL AKHIR'));
-        if(idx !== -1) { headerRowIdx = i; dateColIdx = idx; break; }
+        const idx = rowUpper.findIndex(h => (h.includes('AKHIR') || h.includes('SELESAI') || h.includes('JATUH TEMPO') || h.includes('BATAS') || h.includes('BERAKHIR')) && !h.includes('STATUS') && !h.includes('KET'));
+        const idxBastp = rowUpper.findIndex(h => h.includes('BASTP') || h.includes('SERAH TERIMA') || h.includes('PHO') || h.includes('BERITA ACARA') || h.includes('TGL BAST') || h.includes('TANGGAL BAST') || h.includes('STATUS') || h.includes('KETERANGAN') || h.includes('KET.'));
+        if(idx !== -1) { headerRowIdx = i; dateColIdx = idx; bastpColIdx = idxBastp; break; }
     }
     if (headerRowIdx === -1) return;
 
@@ -459,12 +460,23 @@
     for (let i = headerRowIdx + 1; i < rows.length; i++) {
         const row = rows[i];
         if (!row[dateColIdx]) continue;
+
+        // Cek BASTP
+        let isBastpClear = false;
+        if (bastpColIdx !== -1 && row[bastpColIdx]) {
+             const bastpStr = row[bastpColIdx].trim();
+             const upperStr = bastpStr.toUpperCase();
+             if ((bastpStr.length > 4 && parseIndonesianDate(bastpStr)) || upperStr.includes('SUDAH') || upperStr.includes('SELESAI') || upperStr.includes('LENGKAP') || upperStr.includes('OK') || upperStr.includes('ADA')) isBastpClear = true;
+             if (upperStr.includes('BELUM')) isBastpClear = false;
+        }
+        if (isBastpClear) continue;
+
         const dateStr = row[dateColIdx].trim();
         let contractDate = parseIndonesianDate(dateStr);
         if (contractDate) {
             contractDate.setHours(0,0,0,0);
             
-            // Cek jika tanggal kontrak <= 5 hari ke depan (termasuk yang sudah lewat/expired)
+            // LOGIKA: Tampilkan jika (Expired/Masa Lalu) ATAU (H-5 ke depan)
             if (contractDate <= maxDate) {
                 let statusMsg = "";
                 let notifTitle = "Peringatan Kontrak";
@@ -472,12 +484,13 @@
                 if (contractDate < today) {
                     const diffTime = Math.abs(today - contractDate);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    statusMsg = `Telat ${diffDays} hari`;
-                    notifTitle = "Kontrak Expired";
+                    statusMsg = `Telat ${diffDays} hari (BASTP Belum)`;
+                    notifTitle = "BASTP Belum (Expired)";
                 } else {
                     const diffTime = Math.abs(contractDate - today);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    statusMsg = diffDays === 0 ? "Hari Ini" : `${diffDays} hari lagi`;
+                    statusMsg = diffDays === 0 ? "Hari Ini (BASTP Belum)" : `${diffDays} hari lagi (BASTP Belum)`;
+                    notifTitle = "BASTP Belum (Segera)";
                 }
 
                 const name = row[nameIdx] || 'Tanpa Nama';
@@ -497,10 +510,10 @@
   function parseIndonesianDate(dateStr) {
       if (!dateStr) return null;
       dateStr = dateStr.trim();
-      let isoMatch = dateStr.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})$/);
+      let isoMatch = dateStr.match(/(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
       if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
       let cleanStr = dateStr.toLowerCase().replace(/,/g, '');
-      let parts = cleanStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+      let parts = cleanStr.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
       if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
       let textParts = cleanStr.split(/[\s\-]+/);
       if (textParts.length >= 3) {
