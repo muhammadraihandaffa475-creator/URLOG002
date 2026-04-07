@@ -65,28 +65,35 @@
                             <p style="font-size: 1.1rem; line-height: 1.6; color: #64748b;">Masukkan nilai anggaran dan jenis kegiatan di sebelah kiri, lalu klik <strong>Hitung Pajak</strong> untuk melihat rincian potongannya.</p>
                         </div>
                         
-                        <div class="calc-result-box" id="resPajakBox" style="display: none;">
-                            <div class="res-row" style="font-size: 1.05rem;"><span><i class="fas fa-coins" style="color: #94a3b8; margin-right: 10px;"></i> 1. Nilai Anggaran:</span> <strong id="resNilai">Rp 0</strong></div>
-                            <div class="res-row" style="font-size: 1.05rem;"><span><i class="fas fa-tag" style="color: #94a3b8; margin-right: 10px;"></i> 2. Jenis Kegiatan:</span> <strong id="resJenis">-</strong></div>
-                            
-                            <div style="margin-top: 30px; font-size: 1.1rem; color: #1e293b; font-weight: 800;"><i class="fas fa-receipt" style="color: #3b82f6; margin-right: 8px;"></i> 3. Rincian Pemotongan Pajak:</div>
-                            <div class="rincian-box">
-                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>a. PPN:</span> <strong id="resPPN">Rp 0</strong></div>
-                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>b. PPh 22:</span> <strong id="resPPh22">Rp 0</strong></div>
-                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>c. PPh 23:</span> <strong id="resPPh23">Rp 0</strong></div>
-                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>d. PPh 4(2) Konsultansi:</span> <strong id="resPPh42Konsul">Rp 0</strong></div>
-                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 0;"><span>e. PPh 4(2) Konstruksi:</span> <strong id="resPPh42Konstruksi">Rp 0</strong></div>
-                            </div>
-                            
-                            <div class="res-total" style="padding-top: 0; margin-top: 0; border: none;">
-                                <span style="font-size: 1.1rem;">4. Total Pajak:</span> <strong id="resTotalPajak" style="color: #ef4444; font-size: 1.5rem;">Rp 0</strong>
-                            </div>
-                            <div style="flex: 1;"></div> <!-- Pendorong ke Bawah -->
-                            <div class="res-total" style="background: linear-gradient(135deg, #10b981, #047857); margin: 20px 0 0 0; padding: 25px 30px; color: white; display: flex; justify-content: space-between; align-items: center; border-radius: 24px; box-shadow: 0 15px 30px rgba(16, 185, 129, 0.25); border: 1px solid rgba(255,255,255,0.2);">
-                                <span style="font-size: 1.1rem; font-weight: 600; color: #d1fae5;">5. Nilai Bersih Diterima:</span> <strong id="resNetto" style="color: #ffffff; font-size: 1.9rem; letter-spacing: -0.5px;">Rp 0</strong>
-                                <button onclick="copyText('resNetto', this)" class="btn-copy" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); color: white; margin: 0; padding: 10px 20px; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"><i class="fas fa-copy"></i> Salin</button>
-                            </div>
-                        </div>
+<div class="tax-results" id="resPajakBox" style="display: none;">
+    <div class="result-item">
+        <span><i class="fas fa-coins" style="color: #94a3b8; margin-right: 10px;"></i>1. Nilai Anggaran:</span>
+        <strong id="resNilai">Rp 0</strong>
+    </div>
+    <div class="result-item">
+        <span><i class="fas fa-tag" style="color: #94a3b8; margin-right: 10px;"></i>2. Jenis Kegiatan:</span>
+        <strong id="resJenis">-</strong>
+    </div>
+    <div style="margin: 1.5rem 0 0.5rem 0; font-size: 1.125rem; color: #1e293b; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-receipt" style="color: #3b82f6;"></i>3. Rincian Pemotongan Pajak:
+    </div>
+    <div class="rincian-grid">
+        <div class="result-item"><span>a. PPN:</span><strong id="resPPN">Rp 0</strong></div>
+        <div class="result-item"><span>b. PPh 22:</span><strong id="resPPh22">Rp 0</strong></div>
+        <div class="result-item"><span>c. PPh 23:</span><strong id="resPPh23">Rp 0</strong></div>
+        <div class="result-item"><span>d. PPh 4(2) Konsultansi:</span><strong id="resPPh42Konsul">Rp 0</strong></div>
+        <div class="result-item"><span>e. PPh 4(2) Konstruksi:</span><strong id="resPPh42Konstruksi">Rp 0</strong></div>
+    </div>
+    <div class="total-pajak">
+        <span>4. Total Pajak:</span>
+        <strong id="resTotalPajak">Rp 0</strong>
+    </div>
+    <div class="netto-highlight">
+        <span>5. Nilai Bersih Diterima:</span>
+        <strong id="resNetto">Rp 0</strong>
+        <button onclick="copyText('resNetto', this)" class="btn-copy"><i class="fas fa-copy"></i> Salin</button>
+    </div>
+</div>
                     </div>
                 </div>
             </div>
@@ -233,8 +240,17 @@
 
             ['resPPN', 'resPPh22', 'resPPh23', 'resPPh42Konsul', 'resPPh42Konstruksi'].forEach(id => {
                 let el = document.getElementById(id);
-                el.parentElement.style.opacity = (el.innerText === 'Rp 0') ? '0.4' : '1';
+                let parent = el.parentElement;
+                parent.classList.toggle('pajak-zero', el.innerText === 'Rp 0');
             });
+        }
+
+        function resetPajak() {
+            document.getElementById('inpPajak').value = '';
+            document.getElementById('tipeKegiatan').selectedIndex = 0;
+            document.getElementById('resPajakBox').style.display = 'none';
+            document.getElementById('placeholderPajak').style.display = 'flex';
+            document.getElementById('inpPajak').focus();
         }
 
         function hitungHari() {
