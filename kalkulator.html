@@ -233,10 +233,14 @@
             document.getElementById('resTotalPajak').innerText = formatRp(totalPajak);
             document.getElementById('resNetto').innerText = formatRp(nilaiBersih);
 
-            // Tampilkan animasi dengan mengatur ulang display
+            // Tampilkan kotak hasil secara langsung tanpa delay
             const box = document.getElementById('resPajakBox');
-            box.style.display = 'none';
-            setTimeout(() => { box.style.display = 'flex'; }, 10);
+            box.style.display = 'flex';
+            
+            // Refresh efek animasi (mencegah bug hasil tidak muncul)
+            box.style.animation = 'none';
+            void box.offsetWidth; /* Force reflow / render ulang */
+            box.style.animation = null;
 
             ['resPPN', 'resPPh22', 'resPPh23', 'resPPh42Konsul', 'resPPh42Konstruksi'].forEach(id => {
                 let el = document.getElementById(id);
