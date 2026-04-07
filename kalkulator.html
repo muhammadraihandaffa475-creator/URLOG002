@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Kalkulator - Dashboard System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="kalkulator.css">
+</head>
+<body>
+
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <div class="bg-grid"></div>
+
+    <div class="navbar">
+        <div class="nav-brand">
+            <div class="icon-circle"><i class="fa-solid fa-calculator"></i></div>
+            <div class="nav-title">Smart Calculator</div>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('pajak', this)"><i class="fas fa-file-invoice-dollar"></i> Pajak</button>
+            <button class="tab-btn" onclick="switchTab('hari', this)"><i class="fas fa-calendar-alt"></i> Hari</button>
+            <button class="tab-btn" onclick="switchTab('terbilang', this)"><i class="fas fa-spell-check"></i> Terbilang</button>
+        </div>
+        <a href="index.html" class="btn-back"><i class="fas fa-home"></i> Beranda</a>
+    </div>
+
+    <div class="main-content">
+        <div class="glass-panel">
+            
+            <!-- SEKSI 1: PAJAK -->
+            <div id="sec-pajak" class="calc-section active-tab-content">
+                <h2 class="calc-title"><i class="fa-solid fa-file-invoice-dollar" style="color: #0ea5e9;"></i> Kalkulator Pajak</h2>
+                <div class="calc-grid">
+                    <div class="calc-left">
+                        <div class="calc-group">
+                            <label class="calc-label">Nilai Anggaran (Rp)</label>
+                            <input type="text" id="inpPajak" class="calc-input" placeholder="Contoh: 1.000.000" oninput="formatInputRibuan(this)" onkeydown="if(event.key === 'Enter') hitungPajak()" autofocus>
+                        </div>
+                        <div class="calc-group">
+                            <label class="calc-label">Jenis Kegiatan</label>
+                            <select id="tipeKegiatan" class="calc-input" style="cursor:pointer;" onkeydown="if(event.key === 'Enter') hitungPajak()">
+                                <option value="konsultansi">Jasa Konsultansi</option>
+                                <option value="konstruksi">Jasa Konstruksi</option>
+                                <option value="makan">Jasa Lainnya Makan</option>
+                                <option value="non_makan">Jasa Lainnya Non Makan</option>
+                                <option value="barang">Barang</option>
+                            </select>
+                        </div>
+                        <div class="btn-row">
+                            <button onclick="hitungPajak()" class="btn-calc btn-blue" style="flex: 1;"><i class="fas fa-calculator" style="margin-right: 8px;"></i> Hitung Pajak</button>
+                            <button onclick="resetPajak()" class="btn-calc btn-reset" title="Bersihkan Form"><i class="fas fa-redo-alt"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="calc-right">
+                        <div class="calc-result-placeholder" id="placeholderPajak" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); border-radius: 32px; border: 2px dashed rgba(14, 165, 233, 0.4); color: #94a3b8; padding: 40px; text-align: center; transition: 0.3s; box-shadow: inset 0 0 30px rgba(255,255,255,0.5);">
+                            <i class="fas fa-file-invoice-dollar animate-float" style="font-size: 5.5rem; margin-bottom: 30px; color: #38bdf8; filter: drop-shadow(0 15px 25px rgba(56, 189, 248, 0.4));"></i>
+                            <h3 style="color: #0f172a; font-size: 1.6rem; margin-bottom: 15px; font-weight: 800;">Belum Ada Data</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.6; color: #64748b;">Masukkan nilai anggaran dan jenis kegiatan di sebelah kiri, lalu klik <strong>Hitung Pajak</strong> untuk melihat rincian potongannya.</p>
+                        </div>
+                        
+                        <div class="calc-result-box" id="resPajakBox" style="display: none;">
+                            <div class="res-row" style="font-size: 1.05rem;"><span><i class="fas fa-coins" style="color: #94a3b8; margin-right: 10px;"></i> 1. Nilai Anggaran:</span> <strong id="resNilai">Rp 0</strong></div>
+                            <div class="res-row" style="font-size: 1.05rem;"><span><i class="fas fa-tag" style="color: #94a3b8; margin-right: 10px;"></i> 2. Jenis Kegiatan:</span> <strong id="resJenis">-</strong></div>
+                            
+                            <div style="margin-top: 30px; font-size: 1.1rem; color: #1e293b; font-weight: 800;"><i class="fas fa-receipt" style="color: #3b82f6; margin-right: 8px;"></i> 3. Rincian Pemotongan Pajak:</div>
+                            <div class="rincian-box">
+                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>a. PPN:</span> <strong id="resPPN">Rp 0</strong></div>
+                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>b. PPh 22:</span> <strong id="resPPh22">Rp 0</strong></div>
+                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>c. PPh 23:</span> <strong id="resPPh23">Rp 0</strong></div>
+                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 8px;"><span>d. PPh 4(2) Konsultansi:</span> <strong id="resPPh42Konsul">Rp 0</strong></div>
+                                <div class="res-row" style="font-size: 0.95rem; margin-bottom: 0;"><span>e. PPh 4(2) Konstruksi:</span> <strong id="resPPh42Konstruksi">Rp 0</strong></div>
+                            </div>
+                            
+                            <div class="res-total" style="padding-top: 0; margin-top: 0; border: none;">
+                                <span style="font-size: 1.1rem;">4. Total Pajak:</span> <strong id="resTotalPajak" style="color: #ef4444; font-size: 1.5rem;">Rp 0</strong>
+                            </div>
+                            <div style="flex: 1;"></div> <!-- Pendorong ke Bawah -->
+                            <div class="res-total" style="background: linear-gradient(135deg, #10b981, #047857); margin: 20px 0 0 0; padding: 25px 30px; color: white; display: flex; justify-content: space-between; align-items: center; border-radius: 24px; box-shadow: 0 15px 30px rgba(16, 185, 129, 0.25); border: 1px solid rgba(255,255,255,0.2);">
+                                <span style="font-size: 1.1rem; font-weight: 600; color: #d1fae5;">5. Nilai Bersih Diterima:</span> <strong id="resNetto" style="color: #ffffff; font-size: 1.9rem; letter-spacing: -0.5px;">Rp 0</strong>
+                                <button onclick="copyText('resNetto', this)" class="btn-copy" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); color: white; margin: 0; padding: 10px 20px; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"><i class="fas fa-copy"></i> Salin</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEKSI 2: HARI -->
+            <div id="sec-hari" class="calc-section">
+                <h2 class="calc-title"><i class="fa-solid fa-calendar-day" style="color: #10b981;"></i> Kalkulator Waktu</h2>
+                <div class="calc-grid">
+                    <div class="calc-left">
+                        <div class="calc-group">
+                            <label class="calc-label">Tanggal Awal</label>
+                            <input type="date" id="inpTglAwal" class="calc-input" onkeydown="if(event.key === 'Enter') hitungHari()">
+                        </div>
+                        <div class="calc-group">
+                            <label class="calc-label">Tanggal Akhir</label>
+                            <input type="date" id="inpTglAkhir" class="calc-input" onkeydown="if(event.key === 'Enter') hitungHari()">
+                        </div>
+                        <div class="btn-row">
+                            <button onclick="hitungHari()" class="btn-calc btn-green" style="flex: 1;"><i class="fas fa-stopwatch" style="margin-right: 8px;"></i> Hitung Hari</button>
+                            <button onclick="resetHari()" class="btn-calc btn-reset" title="Bersihkan Form"><i class="fas fa-redo-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="calc-right">
+                        <div class="calc-result-box" style="height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                            <div id="resHari" style="width: 100%;"><div style="font-size: 1.15rem; color: #64748b; text-align: center; line-height: 1.6; padding: 20px 0;"><i class="fas fa-stopwatch animate-float" style="font-size: 5rem; color: #34d399; opacity: 0.8; display: block; margin-bottom: 30px; filter: drop-shadow(0 10px 15px rgba(52, 211, 153, 0.3));"></i>Tentukan tanggal awal dan akhir,<br>lalu klik <strong>"Hitung Hari"</strong>.</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEKSI 3: TERBILANG -->
+            <div id="sec-terbilang" class="calc-section">
+                <h2 class="calc-title"><i class="fa-solid fa-spell-check" style="color: #f59e0b;"></i> Konversi Terbilang</h2>
+                <div class="calc-grid">
+                    <div class="calc-left">
+                        <div class="calc-group">
+                            <label class="calc-label">Masukkan Angka Pembayaran</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="inpAngkaTerbilang" class="calc-input" placeholder="Contoh: 1.500.000" oninput="hitungTerbilang()" style="flex: 1;">
+                                <button onclick="resetTerbilang()" class="btn-calc btn-reset" style="margin: 0; padding: 0 20px; width: auto;" title="Bersihkan"><i class="fas fa-redo-alt"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="calc-right">
+                        <div class="calc-result-box" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(145deg, #ffffff, #fffbeb); border-color: #fde68a;">
+                            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #fcd34d, #f59e0b); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <span style="color:#b45309; font-size: 0.95rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800;">Hasil Terbilang</span>
+                            <strong class="res-terbilang" id="resTerbilang" style="font-size: 2.2rem; color: #78350f; line-height: 1.4; font-style: normal; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 10px;">-</strong>
+                            <button onclick="copyText('resTerbilang', this)" class="btn-copy" id="btnCopyTerbilang" style="display: none; background: white; color: #d97706; border-color: #fde68a;"><i class="fas fa-copy"></i> Salin Teks</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.calc-section').forEach(sec => sec.classList.remove('active-tab-content'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            const activeSec = document.getElementById('sec-' + tabId);
+            activeSec.classList.add('active-tab-content');
+            if(btn) btn.classList.add('active');
+
+            // Otomatis fokus ke input pertama di tab yang baru dibuka
+            const firstInput = activeSec.querySelector('input');
+            if(firstInput) setTimeout(() => firstInput.focus(), 10);
+        }
+
+        const formatRp = (num) => "Rp " + num.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+
+        function copyText(elementId, btnElement) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+                btnElement.style.color = '#10b981';
+                if(btnElement.style.background.includes('rgba(0')) btnElement.style.color = '#fff';
+                setTimeout(() => { btnElement.innerHTML = originalHtml; btnElement.style.color = ''; }, 2000);
+            });
+        }
+
+        function formatInputRibuan(input) {
+            let val = input.value.replace(/[^0-9]/g, '');
+            if (val !== '') {
+                input.value = parseInt(val, 10).toLocaleString('id-ID');
+            } else {
+                input.value = '';
+            }
+        }
+
+        function hitungPajak() {
+            const rawVal = document.getElementById('inpPajak').value.replace(/[^0-9]/g, '');
+            const nilai = parseFloat(rawVal) || 0;
+            const jenisSelect = document.getElementById('tipeKegiatan');
+            const jenis = jenisSelect.value;
+            const jenisText = jenisSelect.options[jenisSelect.selectedIndex].text;
+
+            if (nilai === 0) {
+                document.getElementById('resPajakBox').style.display = 'none';
+                document.getElementById('placeholderPajak').style.display = 'flex';
+                return;
+            }
+            document.getElementById('placeholderPajak').style.display = 'none';
+
+            // Perhitungan PPN
+            let ppn = 0;
+            if (jenis !== 'makan') {
+                ppn = nilai * (11 / 111);
+            }
+
+            // Perhitungan Dasar Pengenaan PPh (Nilai - PPN)
+            let dpp = nilai - ppn;
+
+            // Perhitungan PPh sesuai jenis
+            let pph22 = 0, pph23 = 0, pph42konsul = 0, pph42konstruksi = 0;
+            if (jenis === 'barang') { pph22 = dpp * 0.015; } 
+            else if (jenis === 'non_makan' || jenis === 'makan') { pph23 = dpp * 0.02; } 
+            else if (jenis === 'konsultansi') { pph42konsul = dpp * 0.035; } 
+            else if (jenis === 'konstruksi') { pph42konstruksi = dpp * 0.0175; }
+
+            let totalPajak = ppn + pph22 + pph23 + pph42konsul + pph42konstruksi;
+            let nilaiBersih = nilai - totalPajak;
+
+            // Menampilkan di UI
+            document.getElementById('resNilai').innerText = formatRp(nilai);
+            document.getElementById('resJenis').innerText = jenisText;
+            document.getElementById('resPPN').innerText = formatRp(ppn);
+            document.getElementById('resPPh22').innerText = formatRp(pph22);
+            document.getElementById('resPPh23').innerText = formatRp(pph23);
+            document.getElementById('resPPh42Konsul').innerText = formatRp(pph42konsul);
+            document.getElementById('resPPh42Konstruksi').innerText = formatRp(pph42konstruksi);
+            document.getElementById('resTotalPajak').innerText = formatRp(totalPajak);
+            document.getElementById('resNetto').innerText = formatRp(nilaiBersih);
+
+            // Tampilkan animasi dengan mengatur ulang display
+            const box = document.getElementById('resPajakBox');
+            box.style.display = 'none';
+            setTimeout(() => { box.style.display = 'flex'; }, 10);
+
+            ['resPPN', 'resPPh22', 'resPPh23', 'resPPh42Konsul', 'resPPh42Konstruksi'].forEach(id => {
+                let el = document.getElementById(id);
+                el.parentElement.style.opacity = (el.innerText === 'Rp 0') ? '0.4' : '1';
+            });
+        }
+
+        function hitungHari() {
+            const startStr = document.getElementById('inpTglAwal').value;
+            const endStr = document.getElementById('inpTglAkhir').value;
+            
+            const resBox = document.getElementById('resHari');
+            if (!startStr || !endStr) {
+                resBox.innerHTML = '<div style="text-align: center; color: #ef4444; font-weight: 600; padding: 20px;"><i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i> Mohon lengkapi kedua tanggal!</div>';
+                return;
+            }
+
+            const start = new Date(startStr);
+            const end = new Date(endStr);
+            
+            if (start > end) {
+                resBox.innerHTML = '<div style="text-align: center; color: #ef4444; font-weight: 600; padding: 20px;"><i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i> Tanggal awal tidak boleh lebih besar!</div>';
+                return;
+            }
+
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            const tglAwalIndo = start.toLocaleDateString('id-ID', options);
+            const tglAkhirIndo = end.toLocaleDateString('id-ID', options);
+
+            let totalKalender = 0, totalKerja = 0;
+            const counts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }; // 0:Minggu ... 6:Sabtu
+
+            let currentDate = new Date(start);
+            while (currentDate <= end) {
+                totalKalender++;
+                const dayOfWeek = currentDate.getDay();
+                counts[dayOfWeek]++;
+                if (dayOfWeek >= 1 && dayOfWeek <= 5) totalKerja++; // Senin - Jumat
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // Struktur modern menggunakan Widget Grid
+            const teksHasil = `
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <span style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Rentang Waktu</span>
+                    <div style="font-size: 1.15rem; color: #1e293b; font-weight: 800; margin-top: 8px;">${tglAwalIndo} <i class="fas fa-arrow-right" style="color: #cbd5e1; margin: 0 10px;"></i> ${tglAkhirIndo}</div>
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px;">
+                    <div style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); padding: 20px; border-radius: 20px; border: 1px solid #7dd3fc; text-align: center; flex: 1; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1);">
+                        <span style="font-size: 0.8rem; color: #0284c7; font-weight: 800; text-transform: uppercase;">Total Kalender</span>
+                        <strong style="display: block; font-size: 2.5rem; color: #0369a1; margin-top: 5px;">${totalKalender}</strong>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 20px; border-radius: 20px; border: 1px solid #6ee7b7; text-align: center; flex: 1; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);">
+                        <span style="font-size: 0.8rem; color: #059669; font-weight: 800; text-transform: uppercase;">Hari Kerja (Sen-Jum)</span>
+                        <strong style="display: block; font-size: 2.5rem; color: #047857; margin-top: 5px;">${totalKerja}</strong>
+                    </div>
+                </div>
+                <div style="font-size: 0.9rem; color: #475569; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-list-ul" style="color: #3b82f6;"></i> Rincian Hari:</div>
+                <div class="days-grid">
+                    <div class="day-badge" style="${counts[1]>0?'border-color:#0ea5e9;':''}"><span>Senin</span><strong>${counts[1]}</strong></div>
+                    <div class="day-badge" style="${counts[2]>0?'border-color:#0ea5e9;':''}"><span>Selasa</span><strong>${counts[2]}</strong></div>
+                    <div class="day-badge" style="${counts[3]>0?'border-color:#0ea5e9;':''}"><span>Rabu</span><strong>${counts[3]}</strong></div>
+                    <div class="day-badge" style="${counts[4]>0?'border-color:#0ea5e9;':''}"><span>Kamis</span><strong>${counts[4]}</strong></div>
+                    <div class="day-badge" style="${counts[5]>0?'border-color:#0ea5e9;':''}"><span>Jumat</span><strong>${counts[5]}</strong></div>
+                    <div class="day-badge" style="background:#fef2f2; ${counts[6]>0?'border-color:#ef4444; color:#b91c1c;':''}"><span>Sabtu</span><strong>${counts[6]}</strong></div>
+                    <div class="day-badge" style="background:#fef2f2; ${counts[0]>0?'border-color:#ef4444; color:#b91c1c;':''}"><span>Minggu</span><strong>${counts[0]}</strong></div>
+                </div>
+            `;
+
+            // Refresh animasi dengan trik display none
+            resBox.parentElement.style.display = 'none';
+            setTimeout(() => {
+                resBox.parentElement.style.display = 'flex';
+                resBox.innerHTML = teksHasil;
+            }, 10);
+        }
+
+        function hitungTerbilang() {
+            // Ambil teks dari input dan bersihkan karakter selain angka (seperti titik)
+            let rawVal = document.getElementById('inpAngkaTerbilang').value;
+            let cleanVal = rawVal.replace(/[^0-9]/g, '');
+            const angka = parseInt(cleanVal, 10) || 0;
+
+            if (angka === 0) {
+                document.getElementById('resTerbilang').innerText = "-";
+                document.getElementById('btnCopyTerbilang').style.display = 'none';
+                return;
+            }
+
+            // Ubah ke huruf kecil semua, lalu jadikan huruf pertama kapital, dan tambah "rupiah"
+            let teksTerbilang = terbilangIndo(angka).trim().toLowerCase();
+            let hasilAkhir = teksTerbilang.charAt(0).toUpperCase() + teksTerbilang.slice(1) + " rupiah";
+
+            document.getElementById('resTerbilang').innerText = hasilAkhir;
+            document.getElementById('btnCopyTerbilang').style.display = 'inline-flex';
+        }
+
+        function resetTerbilang() {
+            document.getElementById('inpAngkaTerbilang').value = '';
+            document.getElementById('resTerbilang').innerText = "-";
+            document.getElementById('btnCopyTerbilang').style.display = 'none';
+            document.getElementById('inpAngkaTerbilang').focus();
+        }
+
+        function terbilangIndo(a) {
+            let bilne = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+            a = Math.abs(Math.floor(a));
+            if (a < 12) return bilne[a];
+            else if (a < 20) return terbilangIndo(a - 10) + " Belas";
+            else if (a < 100) return terbilangIndo(Math.floor(a / 10)) + " Puluh " + terbilangIndo(a % 10);
+            else if (a < 200) return "Seratus " + terbilangIndo(a - 100);
+            else if (a < 1000) return terbilangIndo(Math.floor(a / 100)) + " Ratus " + terbilangIndo(a % 100);
+            else if (a < 2000) return "Seribu " + terbilangIndo(a - 1000);
+            else if (a < 1000000) return terbilangIndo(Math.floor(a / 1000)) + " Ribu " + terbilangIndo(a % 1000);
+            else if (a < 1000000000) return terbilangIndo(Math.floor(a / 1000000)) + " Juta " + terbilangIndo(a % 1000000);
+            else if (a < 1000000000000) return terbilangIndo(Math.floor(a / 1000000000)) + " Miliar " + terbilangIndo(a % 1000000000);
+            else if (a < 1000000000000000) return terbilangIndo(Math.floor(a / 1000000000000)) + " Triliun " + terbilangIndo(a % 1000000000000);
+            return "";
+        }
+    </script>
+</body>
+</html>
