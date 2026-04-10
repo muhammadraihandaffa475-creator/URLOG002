@@ -276,12 +276,17 @@
 
     /* ===== RESPONSIVE ===== */
     @media(max-width: 900px) {
+      body { height: 100vh; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column; }
       header { padding: 16px 24px; }
 
       .hero {
         grid-template-columns: 1fr;
-        padding: 120px 24px 60px;
+        padding: 100px 24px 40px;
         text-align: center;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
 
       .hero-text h2 { font-size: 2.5rem; }
@@ -294,8 +299,16 @@
       header { padding: 12px 15px; }
       .brand h1 { font-size: 14px; }
       .brand span { font-size: 11px; }
-      .hero-text h2 { font-size: 2rem; }
-      .hero-card { height: 200px; max-width: 100%; }
+      .hero-text h2 { font-size: 1.8rem; margin-bottom: 15px; }
+      .hero-text p { font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+      .hero-card { height: 160px; max-width: 100%; margin-bottom: 10px; }
+      .cta { padding: 14px 24px; font-size: 15px; width: 100%; justify-content: center; }
+      .hero { padding-top: 90px; }
+      
+      /* Menyesuaikan Pop-up Modal agar pas di layar HP */
+      .modal-box { padding: 24px 20px; width: 95%; max-height: 90vh; overflow-y: auto; }
+      .role-btn { padding: 12px; gap: 12px; }
+      .role-btn .icon-bg { width: 40px; height: 40px; font-size: 1.1rem; }
     }
   </style>
 </head>
