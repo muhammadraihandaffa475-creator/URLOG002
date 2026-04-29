@@ -42,8 +42,8 @@
                         <div class="calc-group">
                             <label class="calc-label"><i class="fas fa-sliders-h" style="color: #8b5cf6; margin-right: 6px;"></i> Mode Perhitungan</label>
                             <select id="modeHitung" class="calc-input" style="cursor:pointer;" onchange="updateLabelPajak(); if(document.getElementById('resPajakBox').style.display !== 'none') hitungPajak()" onkeydown="if(event.key === 'Enter') hitungPajak()">
-                                <option value="bruto">Hitung dari Nilai Anggaran (Bruto)</option>
-                                <option value="netto">Cari Bruto dari Nilai Bersih (Netto)</option>
+                                <option value="bruto">nilai sudah termasuk pajak (BRUTO)</option>
+                                <option value="netto">nilai belum termasuk pajak (NETTO)</option>
                             </select>
                         </div>
                         <div class="calc-group">
