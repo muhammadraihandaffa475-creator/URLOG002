@@ -24,6 +24,7 @@
         </div>
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('pajak', this)"><i class="fas fa-file-invoice-dollar"></i> Pajak</button>
+            <button class="tab-btn" onclick="switchTab('ppn', this)"><i class="fas fa-list-ol"></i> Rincian PPN</button>
             <button class="tab-btn" onclick="switchTab('hari', this)"><i class="fas fa-calendar-alt"></i> Hari</button>
             <button class="tab-btn" onclick="switchTab('terbilang', this)"><i class="fas fa-spell-check"></i> Terbilang</button>
         </div>
@@ -105,6 +106,73 @@
         <button onclick="copyText('resNetto', this)" class="btn-copy"><i class="fas fa-copy"></i> Salin</button>
     </div>
 </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEKSI 4: RINCIAN PPN -->
+            <div id="sec-ppn" class="calc-section">
+                <h2 class="calc-title"><i class="fa-solid fa-list-ol" style="color: #8b5cf6;"></i> Rincian PPN (Paste Excel)</h2>
+                <div class="calc-grid" style="grid-template-columns: 1fr 1.8fr;">
+                    <div class="calc-left">
+                        <div class="calc-group">
+                            <label class="calc-label">Data Item (Uraian | Jumlah | Satuan | Harga)</label>
+                            <textarea id="inpDataPPN" class="calc-input" rows="10" placeholder="Contoh Paste dari Excel:&#10;Pulpen&#9;10&#9;Pcs&#9;5550&#10;Kertas A4&#9;5&#9;Rim&#9;111000" style="resize: vertical; font-family: monospace; white-space: pre; font-size: 0.9rem;" onkeydown="if(event.ctrlKey && event.key === 'Enter') hitungRincianPPN()"></textarea>
+                            <span style="font-size: 0.75rem; color: #64748b; margin-top: 5px; display: block;">*Tip: Copy data dari tabel Excel, lalu paste (Ctrl+V) ke dalam kotak ini.</span>
+                        </div>
+                        <div class="calc-group" style="display: flex; align-items: center; gap: 10px; margin-top: -10px; margin-bottom: 25px;">
+                            <input type="checkbox" id="chkDesimalPPN" onchange="if(document.getElementById('resPPNBox').style.display !== 'none') hitungRincianPPN()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #8b5cf6;">
+                            <label for="chkDesimalPPN" class="calc-label" style="margin-bottom: 0; cursor: pointer; user-select: none;">Tampilkan nilai desimal</label>
+                        </div>
+                        <div class="btn-row">
+                            <button onclick="hitungRincianPPN()" class="btn-calc" style="flex: 1; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4);"><i class="fas fa-table" style="margin-right: 8px;"></i> Hitung Rincian</button>
+                            <button onclick="resetRincianPPN()" class="btn-calc btn-reset" title="Bersihkan Form"><i class="fas fa-redo-alt"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="calc-right">
+                        <div class="calc-result-placeholder" id="placeholderPPN" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); border-radius: 32px; border: 2px dashed rgba(139, 92, 246, 0.4); color: #94a3b8; padding: 40px; text-align: center; transition: 0.3s; box-shadow: inset 0 0 30px rgba(255,255,255,0.5);">
+                            <i class="fas fa-clipboard-list animate-float" style="font-size: 5.5rem; margin-bottom: 30px; color: #a78bfa; filter: drop-shadow(0 15px 25px rgba(167, 139, 250, 0.4));"></i>
+                            <h3 style="color: #0f172a; font-size: 1.6rem; margin-bottom: 15px; font-weight: 800;">Belum Ada Data</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.6; color: #64748b;">Paste data dari Excel (Uraian, Jumlah, Satuan, Harga) di sebelah kiri lalu klik <strong>Hitung Rincian</strong>.</p>
+                        </div>
+                        
+                        <div class="tax-results" id="resPPNBox" style="display: none; padding: 1.5rem; max-height: 100%; overflow: hidden; flex-direction: column;">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                                <div style="background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center;">
+                                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Bruto</span>
+                                    <div id="totPPNBruto" style="font-size: 1.1rem; font-weight: 800; color: #1e293b; margin-top: 4px;">Rp 0</div>
+                                </div>
+                                <div style="background: #f0fdf4; padding: 12px; border-radius: 12px; border: 1px solid #bbf7d0; text-align: center;">
+                                    <span style="font-size: 0.75rem; color: #059669; font-weight: 600; text-transform: uppercase;">Total DPP</span>
+                                    <div id="totPPNDPP" style="font-size: 1.1rem; font-weight: 800; color: #047857; margin-top: 4px;">Rp 0</div>
+                                </div>
+                                <div style="background: #eff6ff; padding: 12px; border-radius: 12px; border: 1px solid #bfdbfe; text-align: center;">
+                                    <span style="font-size: 0.75rem; color: #2563eb; font-weight: 600; text-transform: uppercase;">Total PPN</span>
+                                    <div id="totPPNPajak" style="font-size: 1.1rem; font-weight: 800; color: #1d4ed8; margin-top: 4px;">Rp 0</div>
+                                </div>
+                            </div>
+                            <div style="flex: 1; overflow: auto; border: 1px solid #e2e8f0; border-radius: 12px; background: white; margin-bottom: 10px;">
+                                <table class="ppn-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: right; min-width: 800px;">
+                                    <thead style="background: #f8fafc; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 10;">
+                                        <tr>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">No</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: left; min-width: 150px;">Uraian</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">Vol</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">Sat</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1;">Harga Sat.</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #f0fdf4;">DPP Sat.</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #eff6ff;">PPN Sat.</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1;">Total Bruto</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #f0fdf4;">Total DPP</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #eff6ff;">Total PPN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ppnTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -299,6 +367,94 @@
             document.getElementById('placeholderPajak').style.display = 'flex';
             updateLabelPajak();
             document.getElementById('inpPajak').focus();
+        }
+
+        // --- LOGIKA RINCIAN PPN ---
+        function parseLinePPN(line) {
+            let parts = line.split("\t");
+            if (parts.length < 4) {
+                parts = line.trim().split(/\s+/);
+            }
+            if (parts.length < 4) return null;
+
+            let hargaStr = parts.pop();
+            let satuanRaw = parts.pop();
+            let jumlahStr = parts.pop();
+            let namaRaw = parts.join(" ");
+
+            // Bersihkan format titik/koma agar angka dari Excel valid di JS
+            let harga = parseFloat(hargaStr.replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, ''));
+            let jumlah = parseFloat(jumlahStr.replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, ''));
+
+            if (isNaN(harga) || isNaN(jumlah)) return null;
+            return { nama: namaRaw, jumlah: jumlah, satuan: satuanRaw, harga: harga };
+        }
+
+        function hitungRincianPPN() {
+            let text = document.getElementById("inpDataPPN").value.trim();
+            if (!text) {
+                document.getElementById('resPPNBox').style.display = 'none';
+                document.getElementById('placeholderPPN').style.display = 'flex';
+                return;
+            }
+            document.getElementById('placeholderPPN').style.display = 'none';
+            document.getElementById('resPPNBox').style.display = 'flex';
+
+            let lines = text.split("\n");
+            let showDecimal = document.getElementById("chkDesimalPPN").checked;
+            let tbody = document.getElementById("ppnTableBody");
+            tbody.innerHTML = "";
+
+            let totalHargaKeseluruhan = 0;
+            let totalPPNKeseluruhan = 0;
+            let totalDasarKeseluruhan = 0;
+            let no = 1;
+
+            lines.forEach(line => {
+                if (!line.trim()) return;
+                let parsed = parseLinePPN(line);
+                if (!parsed) return;
+                
+                let {nama, jumlah, satuan, harga} = parsed;
+                let ppnSatuan = harga * (11 / 111);
+                let dasarSatuan = harga - ppnSatuan;
+                
+                let totalBruto = harga * jumlah;
+                let ppnTotal = totalBruto * (11 / 111);
+                let dasarTotal = totalBruto - ppnTotal;
+
+                totalHargaKeseluruhan += totalBruto;
+                totalPPNKeseluruhan += ppnTotal;
+                totalDasarKeseluruhan += dasarTotal;
+
+                let tr = document.createElement("tr");
+                tr.style.borderBottom = "1px solid #f1f5f9";
+                tr.innerHTML = `
+                    <td style="padding: 10px 12px; text-align: center;">${no++}</td>
+                    <td style="padding: 10px 12px; text-align: left; font-weight: 500; color: #334155;">${nama}</td>
+                    <td style="padding: 10px 12px; text-align: center;">${jumlah}</td>
+                    <td style="padding: 10px 12px; text-align: center;">${satuan}</td>
+                    <td style="padding: 10px 12px;">${formatRp(harga, showDecimal).replace('Rp ', '')}</td>
+                    <td style="padding: 10px 12px; background: #fcfdfd; color: #047857;">${formatRp(dasarSatuan, showDecimal).replace('Rp ', '')}</td>
+                    <td style="padding: 10px 12px; background: #f8fafc; color: #1d4ed8;">${formatRp(ppnSatuan, showDecimal).replace('Rp ', '')}</td>
+                    <td style="padding: 10px 12px; font-weight: 600;">${formatRp(totalBruto, showDecimal).replace('Rp ', '')}</td>
+                    <td style="padding: 10px 12px; background: #fcfdfd; color: #047857; font-weight: 600;">${formatRp(dasarTotal, showDecimal).replace('Rp ', '')}</td>
+                    <td style="padding: 10px 12px; background: #f8fafc; color: #1d4ed8; font-weight: 600;">${formatRp(ppnTotal, showDecimal).replace('Rp ', '')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totPPNBruto').innerText = formatRp(totalHargaKeseluruhan, showDecimal);
+            document.getElementById('totPPNDPP').innerText = formatRp(totalDasarKeseluruhan, showDecimal);
+            document.getElementById('totPPNPajak').innerText = formatRp(totalPPNKeseluruhan, showDecimal);
+        }
+
+        function resetRincianPPN() {
+            document.getElementById('inpDataPPN').value = '';
+            document.getElementById('chkDesimalPPN').checked = false;
+            document.getElementById('resPPNBox').style.display = 'none';
+            document.getElementById('placeholderPPN').style.display = 'flex';
+            document.getElementById('inpDataPPN').focus();
         }
 
         function hitungHari() {
