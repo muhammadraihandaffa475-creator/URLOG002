@@ -40,18 +40,18 @@
                 <div class="calc-grid">
                     <div class="calc-left">
                         <div class="calc-group">
-                            <label class="calc-label">Mode Perhitungan</label>
+                            <label class="calc-label"><i class="fas fa-sliders-h" style="color: #8b5cf6; margin-right: 6px;"></i> Mode Perhitungan</label>
                             <select id="modeHitung" class="calc-input" style="cursor:pointer;" onchange="updateLabelPajak(); if(document.getElementById('resPajakBox').style.display !== 'none') hitungPajak()" onkeydown="if(event.key === 'Enter') hitungPajak()">
                                 <option value="bruto">Hitung dari Nilai Anggaran (Bruto)</option>
                                 <option value="netto">Cari Bruto dari Nilai Bersih (Netto)</option>
                             </select>
                         </div>
                         <div class="calc-group">
-                            <label class="calc-label" id="lblInpPajak">Nilai Anggaran / Bruto (Rp)</label>
+                            <label class="calc-label" id="lblInpPajak"><i class="fas fa-money-bill-wave" style="color: #10b981; margin-right: 6px;"></i> Nilai Anggaran / Bruto (Rp)</label>
                             <input type="text" id="inpPajak" class="calc-input" placeholder="Contoh: 1.000.000" oninput="formatInputRibuan(this)" onkeydown="if(event.key === 'Enter') hitungPajak()" autofocus>
                         </div>
                         <div class="calc-group">
-                            <label class="calc-label">Jenis Kegiatan</label>
+                            <label class="calc-label"><i class="fas fa-briefcase" style="color: #f59e0b; margin-right: 6px;"></i> Jenis Kegiatan</label>
                             <select id="tipeKegiatan" class="calc-input" style="cursor:pointer;" onkeydown="if(event.key === 'Enter') hitungPajak()">
                                 <option value="konsultansi">Jasa Konsultansi</option>
                                 <option value="konstruksi">Jasa Konstruksi</option>
@@ -116,9 +116,9 @@
                 <div class="calc-grid" style="grid-template-columns: 1fr 1.8fr;">
                     <div class="calc-left">
                         <div class="calc-group">
-                            <label class="calc-label">Data Item (Uraian | Jumlah | Satuan | Harga)</label>
+                            <label class="calc-label"><i class="fas fa-file-excel" style="color: #10b981; margin-right: 6px;"></i> Data Item (Uraian | Jumlah | Satuan | Harga)</label>
                             <textarea id="inpDataPPN" class="calc-input" rows="10" placeholder="Contoh Paste dari Excel:&#10;Pulpen&#9;10&#9;Pcs&#9;5550&#10;Kertas A4&#9;5&#9;Rim&#9;111000" style="resize: vertical; font-family: monospace; white-space: pre; font-size: 0.9rem;" onkeydown="if(event.ctrlKey && event.key === 'Enter') hitungRincianPPN()"></textarea>
-                            <span style="font-size: 0.75rem; color: #64748b; margin-top: 5px; display: block;">*Tip: Copy data dari tabel Excel, lalu paste (Ctrl+V) ke dalam kotak ini.</span>
+                            <span style="font-size: 0.75rem; color: #64748b; margin-top: 8px; display: block; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; border-left: 3px solid #8b5cf6;"><i class="fas fa-lightbulb" style="color:#eab308;"></i> Tip: Copy data dari tabel Excel, lalu paste (Ctrl+V) ke dalam kotak ini.</span>
                         </div>
                         <div class="calc-group" style="display: flex; align-items: center; gap: 10px; margin-top: -10px; margin-bottom: 25px;">
                             <input type="checkbox" id="chkDesimalPPN" onchange="if(document.getElementById('resPPNBox').style.display !== 'none') hitungRincianPPN()" style="width: 18px; height: 18px; cursor: pointer; accent-color: #8b5cf6;">
@@ -140,16 +140,16 @@
                         <div class="tax-results" id="resPPNBox" style="display: none; padding: 1.5rem; max-height: 100%; overflow: hidden; flex-direction: column;">
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; flex-shrink: 0;">
                                 <div style="background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center;">
-                                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Bruto</span>
-                                    <div id="totPPNBruto" style="font-size: 1.1rem; font-weight: 800; color: #1e293b; margin-top: 4px;">Rp 0</div>
-                                </div>
-                                <div style="background: #f0fdf4; padding: 12px; border-radius: 12px; border: 1px solid #bbf7d0; text-align: center;">
-                                    <span style="font-size: 0.75rem; color: #059669; font-weight: 600; text-transform: uppercase;">Total DPP</span>
-                                    <div id="totPPNDPP" style="font-size: 1.1rem; font-weight: 800; color: #047857; margin-top: 4px;">Rp 0</div>
+                                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Harga</span>
+                                    <div id="totPPNHarga" style="font-size: 1.1rem; font-weight: 800; color: #1e293b; margin-top: 4px;">Rp 0</div>
                                 </div>
                                 <div style="background: #eff6ff; padding: 12px; border-radius: 12px; border: 1px solid #bfdbfe; text-align: center;">
                                     <span style="font-size: 0.75rem; color: #2563eb; font-weight: 600; text-transform: uppercase;">Total PPN</span>
                                     <div id="totPPNPajak" style="font-size: 1.1rem; font-weight: 800; color: #1d4ed8; margin-top: 4px;">Rp 0</div>
+                                </div>
+                                <div style="background: #f0fdf4; padding: 12px; border-radius: 12px; border: 1px solid #bbf7d0; text-align: center;">
+                                    <span style="font-size: 0.75rem; color: #059669; font-weight: 600; text-transform: uppercase;">Total Dasar</span>
+                                    <div id="totPPNDasar" style="font-size: 1.1rem; font-weight: 800; color: #047857; margin-top: 4px;">Rp 0</div>
                                 </div>
                             </div>
                             <div style="flex: 1; overflow: auto; border: 1px solid #e2e8f0; border-radius: 12px; background: white; margin-bottom: 10px;">
@@ -158,14 +158,14 @@
                                         <tr>
                                             <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">No</th>
                                             <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: left; min-width: 150px;">Uraian</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">Vol</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">Sat</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1;">Harga Sat.</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #f0fdf4;">DPP Sat.</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #eff6ff;">PPN Sat.</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1;">Total Bruto</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #f0fdf4;">Total DPP</th>
-                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #eff6ff;">Total PPN</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">Jumlah</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; text-align: center;">Satuan</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1;">Harga</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #eff6ff;">PPN Satuan</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #f0fdf4;">Dasar Satuan</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1;">Total</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #eff6ff;">PPN Total</th>
+                                            <th style="padding: 12px 10px; border-bottom: 2px solid #cbd5e1; background: #f0fdf4;">Dasar Total</th>
                                         </tr>
                                     </thead>
                                     <tbody id="ppnTableBody">
@@ -183,11 +183,11 @@
                 <div class="calc-grid">
                     <div class="calc-left">
                         <div class="calc-group">
-                            <label class="calc-label">Tanggal Awal</label>
+                            <label class="calc-label"><i class="fas fa-calendar-plus" style="color: #3b82f6; margin-right: 6px;"></i> Tanggal Awal</label>
                             <input type="date" id="inpTglAwal" class="calc-input" onkeydown="if(event.key === 'Enter') hitungHari()">
                         </div>
                         <div class="calc-group">
-                            <label class="calc-label">Tanggal Akhir</label>
+                            <label class="calc-label"><i class="fas fa-calendar-check" style="color: #10b981; margin-right: 6px;"></i> Tanggal Akhir</label>
                             <input type="date" id="inpTglAkhir" class="calc-input" onkeydown="if(event.key === 'Enter') hitungHari()">
                         </div>
                         <div class="btn-row">
@@ -209,7 +209,7 @@
                 <div class="calc-grid">
                     <div class="calc-left">
                         <div class="calc-group">
-                            <label class="calc-label">Masukkan Angka Pembayaran</label>
+                            <label class="calc-label"><i class="fas fa-keyboard" style="color: #f59e0b; margin-right: 6px;"></i> Masukkan Angka Pembayaran</label>
                             <div style="display: flex; gap: 10px;">
                                 <input type="text" id="inpAngkaTerbilang" class="calc-input" placeholder="Contoh: 1.500.000" oninput="hitungTerbilang()" style="flex: 1;">
                                 <button onclick="resetTerbilang()" class="btn-calc btn-reset" style="margin: 0; padding: 0 20px; width: auto;" title="Bersihkan"><i class="fas fa-redo-alt"></i></button>
@@ -277,9 +277,9 @@
             const mode = document.getElementById('modeHitung').value;
             const lbl = document.getElementById('lblInpPajak');
             if (mode === 'bruto') {
-                lbl.innerText = 'Nilai Anggaran / Bruto (Rp)';
+                lbl.innerHTML = '<i class="fas fa-money-bill-wave" style="color: #10b981; margin-right: 6px;"></i> Nilai Anggaran / Bruto (Rp)';
             } else {
-                lbl.innerText = 'Target Nilai Bersih / Netto (Rp)';
+                lbl.innerHTML = '<i class="fas fa-bullseye" style="color: #f43f5e; margin-right: 6px;"></i> Target Nilai Bersih / Netto (Rp)';
             }
         }
 
@@ -435,18 +435,18 @@
                     <td style="padding: 10px 12px; text-align: center;">${jumlah}</td>
                     <td style="padding: 10px 12px; text-align: center;">${satuan}</td>
                     <td style="padding: 10px 12px;">${formatRp(harga, showDecimal).replace('Rp ', '')}</td>
-                    <td style="padding: 10px 12px; background: #fcfdfd; color: #047857;">${formatRp(dasarSatuan, showDecimal).replace('Rp ', '')}</td>
                     <td style="padding: 10px 12px; background: #f8fafc; color: #1d4ed8;">${formatRp(ppnSatuan, showDecimal).replace('Rp ', '')}</td>
+                    <td style="padding: 10px 12px; background: #fcfdfd; color: #047857;">${formatRp(dasarSatuan, showDecimal).replace('Rp ', '')}</td>
                     <td style="padding: 10px 12px; font-weight: 600;">${formatRp(totalBruto, showDecimal).replace('Rp ', '')}</td>
-                    <td style="padding: 10px 12px; background: #fcfdfd; color: #047857; font-weight: 600;">${formatRp(dasarTotal, showDecimal).replace('Rp ', '')}</td>
                     <td style="padding: 10px 12px; background: #f8fafc; color: #1d4ed8; font-weight: 600;">${formatRp(ppnTotal, showDecimal).replace('Rp ', '')}</td>
+                    <td style="padding: 10px 12px; background: #fcfdfd; color: #047857; font-weight: 600;">${formatRp(dasarTotal, showDecimal).replace('Rp ', '')}</td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('totPPNBruto').innerText = formatRp(totalHargaKeseluruhan, showDecimal);
-            document.getElementById('totPPNDPP').innerText = formatRp(totalDasarKeseluruhan, showDecimal);
+            document.getElementById('totPPNHarga').innerText = formatRp(totalHargaKeseluruhan, showDecimal);
             document.getElementById('totPPNPajak').innerText = formatRp(totalPPNKeseluruhan, showDecimal);
+            document.getElementById('totPPNDasar').innerText = formatRp(totalDasarKeseluruhan, showDecimal);
         }
 
         function resetRincianPPN() {
