@@ -39,7 +39,14 @@
                 <div class="calc-grid">
                     <div class="calc-left">
                         <div class="calc-group">
-                            <label class="calc-label">Nilai Anggaran (Rp)</label>
+                            <label class="calc-label">Mode Perhitungan</label>
+                            <select id="modeHitung" class="calc-input" style="cursor:pointer;" onchange="updateLabelPajak(); if(document.getElementById('resPajakBox').style.display !== 'none') hitungPajak()" onkeydown="if(event.key === 'Enter') hitungPajak()">
+                                <option value="bruto">Hitung dari Nilai Anggaran (Bruto)</option>
+                                <option value="netto">Cari Bruto dari Nilai Bersih (Netto)</option>
+                            </select>
+                        </div>
+                        <div class="calc-group">
+                            <label class="calc-label" id="lblInpPajak">Nilai Anggaran / Bruto (Rp)</label>
                             <input type="text" id="inpPajak" class="calc-input" placeholder="Contoh: 1.000.000" oninput="formatInputRibuan(this)" onkeydown="if(event.key === 'Enter') hitungPajak()" autofocus>
                         </div>
                         <div class="calc-group">
@@ -198,14 +205,25 @@
             }
         }
 
+        function updateLabelPajak() {
+            const mode = document.getElementById('modeHitung').value;
+            const lbl = document.getElementById('lblInpPajak');
+            if (mode === 'bruto') {
+                lbl.innerText = 'Nilai Anggaran / Bruto (Rp)';
+            } else {
+                lbl.innerText = 'Target Nilai Bersih / Netto (Rp)';
+            }
+        }
+
         function hitungPajak() {
             const rawVal = document.getElementById('inpPajak').value.replace(/[^0-9]/g, '');
-            const nilai = parseFloat(rawVal) || 0;
+            const inputNilai = parseFloat(rawVal) || 0;
             const jenisSelect = document.getElementById('tipeKegiatan');
             const jenis = jenisSelect.value;
             const jenisText = jenisSelect.options[jenisSelect.selectedIndex].text;
+            const mode = document.getElementById('modeHitung').value;
 
-            if (nilai === 0) {
+            if (inputNilai === 0) {
                 document.getElementById('resPajakBox').style.display = 'none';
                 document.getElementById('placeholderPajak').style.display = 'flex';
                 return;
@@ -213,27 +231,40 @@
             document.getElementById('placeholderPajak').style.display = 'none';
             const showDecimal = document.getElementById('chkDesimal').checked;
 
-            // Perhitungan PPN
-            let ppn = 0;
-            if (jenis !== 'makan') {
-                ppn = nilai * (11 / 111);
+            // Tentukan tarif PPh
+            let tarif = 0;
+            if (jenis === 'barang') tarif = 0.015;
+            else if (jenis === 'non_makan' || jenis === 'makan') tarif = 0.02;
+            else if (jenis === 'konsultansi') tarif = 0.035;
+            else if (jenis === 'konstruksi') tarif = 0.0175;
+
+            let nilaiBruto = inputNilai;
+            // Mode Netto: cari Bruto dari target Netto
+            if (mode === 'netto') {
+                if (jenis !== 'makan') {
+                    nilaiBruto = inputNilai / ((100 / 111) * (1 - tarif));
+                } else {
+                    nilaiBruto = inputNilai / (1 - tarif);
+                }
             }
 
-            // Perhitungan Dasar Pengenaan PPh (Nilai - PPN)
-            let dpp = nilai - ppn;
+            let ppn = 0;
+            if (jenis !== 'makan') {
+                ppn = nilaiBruto * (11 / 111);
+            }
 
-            // Perhitungan PPh sesuai jenis
+            let dpp = nilaiBruto - ppn;
+
             let pph22 = 0, pph23 = 0, pph42konsul = 0, pph42konstruksi = 0;
-            if (jenis === 'barang') { pph22 = dpp * 0.015; } 
-            else if (jenis === 'non_makan' || jenis === 'makan') { pph23 = dpp * 0.02; } 
-            else if (jenis === 'konsultansi') { pph42konsul = dpp * 0.035; } 
-            else if (jenis === 'konstruksi') { pph42konstruksi = dpp * 0.0175; }
+            if (jenis === 'barang') pph22 = dpp * tarif;
+            else if (jenis === 'non_makan' || jenis === 'makan') pph23 = dpp * tarif;
+            else if (jenis === 'konsultansi') pph42konsul = dpp * tarif;
+            else if (jenis === 'konstruksi') pph42konstruksi = dpp * tarif;
 
             let totalPajak = ppn + pph22 + pph23 + pph42konsul + pph42konstruksi;
-            let nilaiBersih = nilai - totalPajak;
+            let nilaiBersih = nilaiBruto - totalPajak;
 
-            // Menampilkan di UI
-            document.getElementById('resNilai').innerText = formatRp(nilai, showDecimal);
+            document.getElementById('resNilai').innerText = formatRp(nilaiBruto, showDecimal);
             document.getElementById('resJenis').innerText = jenisText;
             document.getElementById('resPPN').innerText = formatRp(ppn, showDecimal);
             document.getElementById('resPPh22').innerText = formatRp(pph22, showDecimal);
@@ -261,10 +292,12 @@
 
         function resetPajak() {
             document.getElementById('inpPajak').value = '';
+            document.getElementById('modeHitung').selectedIndex = 0;
             document.getElementById('chkDesimal').checked = false;
             document.getElementById('tipeKegiatan').selectedIndex = 0;
             document.getElementById('resPajakBox').style.display = 'none';
             document.getElementById('placeholderPajak').style.display = 'flex';
+            updateLabelPajak();
             document.getElementById('inpPajak').focus();
         }
 
