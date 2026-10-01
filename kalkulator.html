@@ -24,6 +24,7 @@
         </div>
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('pajak', this)"><i class="fas fa-file-invoice-dollar"></i> Pajak</button>
+            <button class="tab-btn" onclick="switchTab('dasar', this)"><i class="fas fa-calculator"></i> Dasar</button>
             <button class="tab-btn" onclick="switchTab('ppn', this)"><i class="fas fa-list-ol"></i> Rincian PPN</button>
             <button class="tab-btn" onclick="switchTab('hari', this)"><i class="fas fa-calendar-alt"></i> Hari</button>
             <button class="tab-btn" onclick="switchTab('terbilang', this)"><i class="fas fa-spell-check"></i> Terbilang</button>
@@ -34,6 +35,11 @@
     <div class="main-content">
         <div class="glass-panel">
             
+            <!-- SEKSI 0: KALKULATOR DASAR -->
+            <div id="sec-dasar" class="calc-section calc-section-flush">
+                <iframe src="kalkulator-dasar.html" title="Kalkulator Dasar" style="width:100%; height:100%; flex:1 1 auto; min-height:0; border:none; background:transparent;" allowfullscreen></iframe>
+            </div>
+
             <!-- SEKSI 1: PAJAK -->
             <div id="sec-pajak" class="calc-section active-tab-content">
                 <h2 class="calc-title"><i class="fa-solid fa-file-invoice-dollar" style="color: #0ea5e9;"></i> Kalkulator Pajak</h2>
@@ -240,6 +246,13 @@
             const activeSec = document.getElementById('sec-' + tabId);
             activeSec.classList.add('active-tab-content');
             if(btn) btn.classList.add('active');
+
+            // Tab kalkulator dasar memakai iframe, muat ulang agar mewarisi tema terbaru
+            if (tabId === 'dasar') {
+                const frame = activeSec.querySelector('iframe');
+                if (frame) frame.src = frame.src;
+                return;
+            }
 
             // Otomatis fokus ke input pertama di tab yang baru dibuka
             const firstInput = activeSec.querySelector('input');
